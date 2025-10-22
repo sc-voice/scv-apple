@@ -54,10 +54,8 @@ final class Card {
         if !name.isEmpty {
             return name
         } else {
-            // If name is empty, set it to localized CardType + ID
-            let defaultName = "\(localizedCardTypeName()) \(id)"
-            name = defaultName
-            return defaultName
+            // Always return localized CardType + ID (don't store in name)
+            return "\(localizedCardTypeName()) \(id)"
         }
     }
     
@@ -78,9 +76,14 @@ class CardManager {
         // No initialization needed
     }
     
-    /// Returns all cards
+    /// Syncs CardManager with SwiftData cards
+    func syncWithSwiftData(_ swiftDataCards: [Card]) {
+        cards = swiftDataCards.sorted { $0.createdAt < $1.createdAt }
+    }
+    
+    /// Returns all cards sorted by createdAt in ascending order
     var allCards: [Card] {
-        return cards
+        return cards.sorted { $0.createdAt < $1.createdAt }
     }
     
     /// Returns count for a specific card type
@@ -102,7 +105,8 @@ class CardManager {
     /// Adds a new card
     func addCard(_ card: Card) {
         cards.append(card)
-        // ID is already set during card initialization
+        // Sort cards after adding to maintain ascending createdAt order
+        cards.sort { $0.createdAt < $1.createdAt }
     }
     
     /// Removes a card (counts are never decremented)

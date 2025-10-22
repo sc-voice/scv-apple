@@ -11,16 +11,17 @@ import SwiftData
 struct ContentView: View {
     @State private var cardManager = CardManager.shared
     @Environment(\.modelContext) private var modelContext
-    @Query private var persistedCards: [Card]
+    @Query(sort: \Card.createdAt, order: .forward) private var persistedCards: [Card]
+    @Environment(\.locale) private var locale
 
     var body: some View {
         NavigationSplitView {
             List {
                 ForEach(persistedCards) { card in
                     NavigationLink {
-                        Text(card.title())
+                        Text(cardTitle(for: card))
                     } label: {
-                        Text(card.title())
+                        Text(cardTitle(for: card))
                     }
                 }
                 .onDelete(perform: deleteCards)
@@ -43,6 +44,24 @@ struct ContentView: View {
         } detail: {
             Text("select.card".localized)
         }
+        .onAppear {
+            // Sync CardManager with SwiftData when view appears
+            cardManager.syncWithSwiftData(persistedCards)
+        }
+        .onChange(of: persistedCards) { _, newCards in
+            // Sync CardManager whenever SwiftData cards change
+            cardManager.syncWithSwiftData(newCards)
+        }
+    }
+    
+    /// Returns the title for a card, respecting current locale
+    private func cardTitle(for card: Card) -> String {
+        if !card.name.isEmpty {
+            return card.name
+        } else {
+            let localizedType = card.localizedCardTypeName()
+            return "\(localizedType) \(card.id)"
+        }
     }
 
     private func addCard() {
@@ -50,6 +69,13 @@ struct ContentView: View {
             let newCard = Card()
             cardManager.addCard(newCard)
             modelContext.insert(newCard)
+            
+            // Save changes to persist to disk
+            do {
+                try modelContext.save()
+            } catch {
+                print("Failed to save context: \(error)")
+            }
         }
     }
 
@@ -57,8 +83,14 @@ struct ContentView: View {
         withAnimation {
             for index in offsets {
                 let card = persistedCards[index]
-                cardManager.removeCard(card)
                 modelContext.delete(card)
+            }
+            
+            // Save changes to persist to disk
+            do {
+                try modelContext.save()
+            } catch {
+                print("Failed to save context: \(error)")
             }
         }
     }

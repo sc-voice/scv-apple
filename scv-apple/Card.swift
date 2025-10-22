@@ -17,13 +17,16 @@ enum CardType: String, CaseIterable, Codable {
 @Model
 final class Card {
     var createdAt: Date
-    var cardType: CardType
+    let cardType: CardType
     var name: String
+    var id: Int
     
     init(createdAt: Date = Date(), cardType: CardType = .search, name: String = "") {
         self.createdAt = createdAt
         self.cardType = cardType
         self.name = name
+        // ID will be set to 1 + largest existing ID for this card type, or 1 if none exist
+        self.id = CardManager.shared.largestId(for: cardType) + 1
     }
     
     /// Returns the appropriate SF Symbol icon name for the card type
@@ -36,13 +39,31 @@ final class Card {
         }
     }
     
+    /// Returns the localized name for the card type
+    func localizedCardTypeName() -> String {
+        switch cardType {
+        case .search:
+            return "card.type.search".localized
+        case .sutta:
+            return "card.type.sutta".localized
+        }
+    }
+    
     /// Returns the display title for the card
     func title() -> String {
         if !name.isEmpty {
             return name
         } else {
-            return "card.at.createdAt".localized(createdAt.formatted(date: .numeric, time: .standard))
+            // If name is empty, set it to localized CardType + ID
+            let defaultName = "\(localizedCardTypeName()) \(id)"
+            name = defaultName
+            return defaultName
         }
+    }
+    
+    /// Returns the card's unique ID
+    func getId() -> Int {
+        return id
     }
 }
 
@@ -52,13 +73,9 @@ class CardManager {
     static let shared = CardManager()
     
     private var cards: [Card] = []
-    private var cardCounts: [CardType: Int] = [:]
     
     private init() {
-        // Initialize counts for all card types
-        for cardType in CardType.allCases {
-            cardCounts[cardType] = 0
-        }
+        // No initialization needed
     }
     
     /// Returns all cards
@@ -68,7 +85,13 @@ class CardManager {
     
     /// Returns count for a specific card type
     func count(for cardType: CardType) -> Int {
-        return cardCounts[cardType] ?? 0
+        return cards.filter { $0.cardType == cardType }.count
+    }
+    
+    /// Returns the largest ID for a specific card type, or 0 if no cards exist
+    func largestId(for cardType: CardType) -> Int {
+        let cardsOfType = cards.filter { $0.cardType == cardType }
+        return cardsOfType.map { $0.id }.max() ?? 0
     }
     
     /// Returns total count of all cards
@@ -76,17 +99,17 @@ class CardManager {
         return cards.count
     }
     
-    /// Adds a new card and updates counts
+    /// Adds a new card
     func addCard(_ card: Card) {
         cards.append(card)
-        cardCounts[card.cardType, default: 0] += 1
+        // ID is already set during card initialization
     }
     
-    /// Removes a card and updates counts
+    /// Removes a card (counts are never decremented)
     func removeCard(_ card: Card) {
         if let index = cards.firstIndex(where: { $0 === card }) {
             cards.remove(at: index)
-            cardCounts[card.cardType, default: 0] = max(0, (cardCounts[card.cardType] ?? 0) - 1)
+            // Counts are never decremented - they only track total created
         }
     }
     

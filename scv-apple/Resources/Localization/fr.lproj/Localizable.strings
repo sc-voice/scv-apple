@@ -10,5 +10,9 @@
 "add.card" = "Ajouter une Carte";
 "select.card" = "Sélectionner une carte";
 
+// Card type strings
+"card.type.search" = "Recherche";
+"card.type.sutta" = "Sutta";
+
 // Error messages
 "model.container.error" = "Impossible de créer ModelContainer : %@";

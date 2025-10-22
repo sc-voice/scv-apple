@@ -27,6 +27,7 @@
 		F20366AE2EA8F25E00E2C0FC /* scv-apple.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "scv-apple.app"; path = "SC-Voice.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F20366BD2EA8F25F00E2C0FC /* scv-appleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "scv-appleTests.xctest"; path = "SC-Voice.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F20366C72EA8F25F00E2C0FC /* scv-appleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "scv-appleUITests.xctest"; path = "SC-Voice.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F29D77EE2EA99ABA00324D86 /* scv-apple.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "scv-apple.xctestplan"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +76,7 @@
 		F20366A52EA8F25E00E2C0FC = {
 			isa = PBXGroup;
 			children = (
+				F29D77EE2EA99ABA00324D86 /* scv-apple.xctestplan */,
 				F20366B02EA8F25E00E2C0FC /* scv-apple */,
 				F20366C02EA8F25F00E2C0FC /* scv-appleTests */,
 				F20366CA2EA8F25F00E2C0FC /* scv-appleUITests */,

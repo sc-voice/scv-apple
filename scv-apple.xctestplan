@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "CD9EEC67-6178-48B3-8F59-A0285DA37C27",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:scv-apple.xcodeproj",
+      "identifier" : "F20366AD2EA8F25E00E2C0FC",
+      "name" : "scv-apple"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:scv-apple.xcodeproj",
+        "identifier" : "F20366BC2EA8F25F00E2C0FC",
+        "name" : "scv-appleTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:scv-apple.xcodeproj",
+        "identifier" : "F20366C62EA8F25F00E2C0FC",
+        "name" : "scv-appleUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

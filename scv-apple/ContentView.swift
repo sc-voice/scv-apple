@@ -14,17 +14,20 @@ struct ContentView: View {
     @Query(sort: \Card.createdAt, order: .forward) private var persistedCards: [Card]
     @Environment(\.locale) private var locale
     @State private var selectedCards: Set<Card.ID> = []
+    @State private var selectedCard: Card?
+    
+    private let selectedCardKey = "SelectedCardID"
 
     var body: some View {
         NavigationSplitView {
-            List(selection: $selectedCards) {
+            List(selection: $selectedCard) {
                 ForEach(persistedCards) { card in
                     HStack {
-                        NavigationLink {
-                            Text(cardTitle(for: card))
-                        } label: {
-                            Text(cardTitle(for: card))
-                        }
+                        Image(systemName: card.iconName())
+                            .foregroundColor(.blue)
+                            .frame(width: 20)
+                        
+                        Text(cardTitle(for: card))
                         
                         Spacer()
                         
@@ -38,6 +41,7 @@ struct ContentView: View {
                             .buttonStyle(PlainButtonStyle())
                         }
                     }
+                    .tag(card)
                 }
 #if os(iOS)
                 .onDelete(perform: deleteCards)
@@ -45,7 +49,7 @@ struct ContentView: View {
             }
             .focusable()
             .onKeyPress(.delete) {
-                deleteSelectedCards()
+                deleteCurrentSelectedCard()
                 return .handled
             }
             .onKeyPress { keyPress in
@@ -53,15 +57,11 @@ struct ContentView: View {
                 if keyPress.key == .delete || 
                    keyPress.characters == "\u{7F}" || 
                    keyPress.characters == "" {
-                    deleteSelectedCards()
+                    deleteCurrentSelectedCard()
                     return .handled
                 }
-                
                 return .ignored
             }
-#if os(macOS)
-            .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
             .toolbar {
                 ToolbarItem {
                     Button(action: addCard) {
@@ -70,7 +70,11 @@ struct ContentView: View {
                 }
             }
         } detail: {
-            Text("select.card".localized)
+            if let selectedCard = selectedCard {
+                Text(cardTitle(for: selectedCard))
+            } else {
+                Text("select.card".localized)
+            }
         }
         .onAppear {
             // Sync CardManager with SwiftData when view appears
@@ -80,6 +84,19 @@ struct ContentView: View {
             // Sync CardManager whenever SwiftData cards change
             cardManager.syncWithSwiftData(newCards)
         }
+            .onChange(of: selectedCard) { _, newSelectedCard in
+                // Sync selectedCards with selectedCard for "X" button display
+                if let newSelectedCard = newSelectedCard {
+                    selectedCards = [newSelectedCard.id]
+                    saveSelectedCard(newSelectedCard.id)
+                } else {
+                    selectedCards = []
+                    saveSelectedCard(nil)
+                }
+            }
+            .onAppear {
+                restoreSelectedCard()
+            }
     }
     
     /// Returns the title for a card, respecting current locale
@@ -91,6 +108,27 @@ struct ContentView: View {
             return "\(localizedType) \(card.id)"
         }
     }
+    
+    /// Save the selected card ID to UserDefaults
+    private func saveSelectedCard(_ cardId: Int?) {
+        if let cardId = cardId {
+            UserDefaults.standard.set(cardId, forKey: selectedCardKey)
+        } else {
+            UserDefaults.standard.removeObject(forKey: selectedCardKey)
+        }
+    }
+    
+    /// Restore the selected card from UserDefaults
+    private func restoreSelectedCard() {
+        let savedCardId = UserDefaults.standard.integer(forKey: selectedCardKey)
+        guard savedCardId != 0 else { return }
+        
+        // Find the card with the saved ID
+        if let card = persistedCards.first(where: { $0.id == savedCardId }) {
+            selectedCard = card
+            selectedCards = [card.id]
+        }
+    }
 
     private func addCard() {
         withAnimation {
@@ -98,9 +136,13 @@ struct ContentView: View {
             cardManager.addCard(newCard)
             modelContext.insert(newCard)
           
-          // Save changes to persist to disk
+          // Save changes to persist to disk first
             do {
                 try modelContext.save()
+                
+                // Select the newly created card after it's saved
+                selectedCard = newCard
+                selectedCards = [newCard.id]
             } catch {
                 print("Failed to save context: \(error)")
             }
@@ -130,9 +172,53 @@ struct ContentView: View {
             // Remove from selection
             selectedCards.remove(card.id)
             
+            // Clear selectedCard if it's the one being deleted
+            if selectedCard?.id == card.id {
+                selectedCard = nil
+            }
+            
             // Save changes to persist to disk
             do {
                 try modelContext.save()
+            } catch {
+                print("Failed to save context: \(error)")
+            }
+        }
+    }
+    
+    private func deleteCurrentSelectedCard() {
+        guard let cardToDelete = selectedCard else { 
+            return 
+        }
+        
+        withAnimation {
+            // Find the next card to select after deletion
+            let sortedCards = persistedCards.sorted { $0.createdAt < $1.createdAt }
+            let currentIndex = sortedCards.firstIndex { $0.id == cardToDelete.id }
+            
+            modelContext.delete(cardToDelete)
+            
+            // Save changes first to update the persisted cards
+            do {
+                try modelContext.save()
+                
+                // Now select the next card from the updated list
+                let updatedCards = persistedCards.sorted { $0.createdAt < $1.createdAt }
+                
+                if let currentIndex = currentIndex, !updatedCards.isEmpty {
+                    let nextIndex = currentIndex < updatedCards.count ? currentIndex : max(0, updatedCards.count - 1)
+                    if nextIndex >= 0 && nextIndex < updatedCards.count {
+                        let nextCard = updatedCards[nextIndex]
+                        selectedCard = nextCard
+                        selectedCards = [nextCard.id]
+                    } else {
+                        selectedCard = nil
+                        selectedCards = []
+                    }
+                } else {
+                    selectedCard = nil
+                    selectedCards = []
+                }
             } catch {
                 print("Failed to save context: \(error)")
             }
@@ -153,6 +239,7 @@ struct ContentView: View {
             
             // Clear selection after deletion
             selectedCards.removeAll()
+            selectedCard = nil
             
             // Save changes to persist to disk
             do {

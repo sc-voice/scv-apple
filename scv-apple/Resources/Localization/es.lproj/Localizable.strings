@@ -6,7 +6,7 @@
 */
 
 // Card-related strings
-"card.at.timestamp" = "Tarjeta en %@";
+"card.at.createdAt" = "Tarjeta en %@";
 "add.card" = "Agregar Tarjeta";
 "select.card" = "Seleccionar una tarjeta";
 

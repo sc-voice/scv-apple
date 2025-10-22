@@ -9,17 +9,16 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var cards: [Card]
+    @State private var cardManager = CardManager.shared
 
     var body: some View {
         NavigationSplitView {
             List {
-                ForEach(cards) { card in
+                ForEach(cardManager.allCards) { card in
                     NavigationLink {
-                        Text("card.at.timestamp".localized(card.timestamp.formatted(date: .numeric, time: .standard)))
+                        Text(card.title())
                     } label: {
-                        Text(card.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                        Text(card.title())
                     }
                 }
                 .onDelete(perform: deleteCards)
@@ -46,21 +45,17 @@ struct ContentView: View {
 
     private func addCard() {
         withAnimation {
-            let newCard = Card(timestamp: Date())
-            modelContext.insert(newCard)
+            cardManager.createCard()
         }
     }
 
     private func deleteCards(offsets: IndexSet) {
         withAnimation {
-            for index in offsets {
-                modelContext.delete(cards[index])
-            }
+            cardManager.removeCards(at: offsets)
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Card.self, inMemory: true)
 }

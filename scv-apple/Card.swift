@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftData
-import SwiftUI
 
 enum CardType: String, CaseIterable, Codable {
     case search = "search"
@@ -21,12 +20,11 @@ final class Card {
     var name: String
     var id: Int
     
-    init(createdAt: Date = Date(), cardType: CardType = .search, name: String = "") {
+    init(createdAt: Date = Date(), cardType: CardType = .search, name: String = "", id: Int = 0) {
         self.createdAt = createdAt
         self.cardType = cardType
         self.name = name
-        // ID will be set to 1 + largest existing ID for this card type, or 1 if none exist
-        self.id = CardManager.shared.largestId(for: cardType) + 1
+        self.id = id
     }
     
     /// Returns the appropriate SF Symbol icon name for the card type
@@ -104,6 +102,8 @@ class CardManager {
     
     /// Adds a new card
     func addCard(_ card: Card) {
+        // Set the card's ID before adding
+        card.id = largestId(for: card.cardType) + 1
         cards.append(card)
         // Sort cards after adding to maintain ascending createdAt order
         cards.sort { $0.createdAt < $1.createdAt }

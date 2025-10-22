@@ -11,15 +11,14 @@ import SwiftData
 @main
 struct scv_appleApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Card.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
         do {
+            let schema = Schema([Card.self])
+            let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("model.container.error".localized(error.localizedDescription))
+            print("SwiftData Error: \(error)")
+            print("Error details: \(error.localizedDescription)")
+            fatalError("Could not create ModelContainer: \(error)")
         }
     }()
 

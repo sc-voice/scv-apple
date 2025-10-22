@@ -1,0 +1,14 @@
+/* 
+  Localizable.strings
+  SC-Voice
+
+  Created by Visakha on 22/10/2025.
+*/
+
+// Card-related strings
+"card.at.timestamp" = "Carte à %@";
+"add.card" = "Ajouter une Carte";
+"select.card" = "Sélectionner une carte";
+
+// Error messages
+"model.container.error" = "Impossible de créer ModelContainer : %@";

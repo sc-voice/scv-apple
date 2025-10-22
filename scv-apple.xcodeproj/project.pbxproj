@@ -24,9 +24,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		F20366AE2EA8F25E00E2C0FC /* scv-apple.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "scv-apple.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F20366BD2EA8F25F00E2C0FC /* scv-appleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "scv-appleTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F20366C72EA8F25F00E2C0FC /* scv-appleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "scv-appleUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F20366AE2EA8F25E00E2C0FC /* scv-apple.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = "scv-apple.app"; path = "SC-Voice.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F20366BD2EA8F25F00E2C0FC /* scv-appleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "scv-appleTests.xctest"; path = "SC-Voice.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F20366C72EA8F25F00E2C0FC /* scv-appleUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "scv-appleUITests.xctest"; path = "SC-Voice.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -192,6 +192,8 @@
 			knownRegions = (
 				en,
 				Base,
+				es,
+				fr,
 			);
 			mainGroup = F20366A52EA8F25E00E2C0FC;
 			minimizedProjectReferenceProxies = 1;
@@ -398,7 +400,9 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDevelopmentRegion = en;
 				INFOPLIST_KEY_CFBundleDisplayName = "SC-Voice";
+				INFOPLIST_KEY_CFBundleLocalizations = "en es fr";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.reference";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -444,7 +448,9 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDevelopmentRegion = en;
 				INFOPLIST_KEY_CFBundleDisplayName = "SC-Voice";
+				INFOPLIST_KEY_CFBundleLocalizations = "en es fr";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.reference";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

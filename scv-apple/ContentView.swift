@@ -17,7 +17,7 @@ struct ContentView: View {
             List {
                 ForEach(cards) { card in
                     NavigationLink {
-                        Text("Card at \(card.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
+                        Text("card.at.timestamp".localized(card.timestamp.formatted(date: .numeric, time: .standard)))
                     } label: {
                         Text(card.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
                     }
@@ -35,12 +35,12 @@ struct ContentView: View {
 #endif
                 ToolbarItem {
                     Button(action: addCard) {
-                        Label("Add Card", systemImage: "plus")
+                        Label("add.card".localized, systemImage: "plus")
                     }
                 }
             }
         } detail: {
-            Text("Select a card")
+            Text("select.card".localized)
         }
     }
 

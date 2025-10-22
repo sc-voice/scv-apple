@@ -1,0 +1,14 @@
+/* 
+  Localizable.strings
+  SC-Voice
+
+  Created by Visakha on 22/10/2025.
+*/
+
+// Card-related strings
+"card.at.timestamp" = "Card at %@";
+"add.card" = "Add Card";
+"select.card" = "Select a card";
+
+// Error messages
+"model.container.error" = "Could not create ModelContainer: %@";

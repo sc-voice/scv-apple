@@ -19,7 +19,7 @@ struct scv_appleApp: App {
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            fatalError("model.container.error".localized(error.localizedDescription))
         }
     }()
 

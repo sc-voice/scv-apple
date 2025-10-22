@@ -10,11 +10,13 @@ import SwiftData
 
 struct ContentView: View {
     @State private var cardManager = CardManager.shared
+    @Environment(\.modelContext) private var modelContext
+    @Query private var persistedCards: [Card]
 
     var body: some View {
         NavigationSplitView {
             List {
-                ForEach(cardManager.allCards) { card in
+                ForEach(persistedCards) { card in
                     NavigationLink {
                         Text(card.title())
                     } label: {
@@ -45,17 +47,24 @@ struct ContentView: View {
 
     private func addCard() {
         withAnimation {
-            cardManager.createCard()
+            let newCard = Card()
+            cardManager.addCard(newCard)
+            modelContext.insert(newCard)
         }
     }
 
     private func deleteCards(offsets: IndexSet) {
         withAnimation {
-            cardManager.removeCards(at: offsets)
+            for index in offsets {
+                let card = persistedCards[index]
+                cardManager.removeCard(card)
+                modelContext.delete(card)
+            }
         }
     }
 }
 
 #Preview {
     ContentView()
+        .modelContainer(for: Card.self, inMemory: true)
 }

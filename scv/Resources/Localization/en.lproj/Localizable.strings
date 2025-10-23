@@ -9,6 +9,7 @@
 "card.at.createdAt" = "Card at %@";
 "add.card" = "Add Card";
 "select.card" = "Select a card";
+"close.card" = "Close Card";
 
 // Card type strings
 "card.type.search" = "Search";

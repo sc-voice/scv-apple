@@ -9,6 +9,7 @@
 "card.at.createdAt" = "Tarjeta en %@";
 "add.card" = "Agregar Tarjeta";
 "select.card" = "Seleccionar una tarjeta";
+"close.card" = "Cerrar Tarjeta";
 
 // Card type strings
 "card.type.search" = "Búsqueda";

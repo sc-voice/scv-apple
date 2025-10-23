@@ -15,10 +15,10 @@ enum CardType: String, CaseIterable, Codable {
 
 @Model
 final class Card {
-    var createdAt: Date
-    let cardType: CardType
+    private(set) var createdAt: Date
+    private(set) var cardType: CardType
     var name: String
-    var id: Int
+    private(set) var id: Int
     
     init(createdAt: Date = Date(), cardType: CardType = .search, name: String = "", id: Int = 0) {
         self.createdAt = createdAt
@@ -49,7 +49,7 @@ final class Card {
     
     /// Returns the display title for the card
     func title() -> String {
-        if !name.isEmpty {
+        if !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             return name
         } else {
             // Always return localized CardType + ID (don't store in name)
@@ -100,13 +100,20 @@ class CardManager {
         return cards.count
     }
     
-    /// Adds a new card
-    func addCard(_ card: Card) {
-        // Set the card's ID before adding
-        card.id = largestId(for: card.cardType) + 1
-        cards.append(card)
+    /// Adds a new card and returns the card with the assigned ID
+    @discardableResult
+    func addCard(_ card: Card) -> Card {
+        // Create a new card with the correct ID since we can't modify the existing one
+        let newCard = Card(
+            createdAt: card.createdAt,
+            cardType: card.cardType,
+            name: card.name,
+            id: largestId(for: card.cardType) + 1
+        )
+        cards.append(newCard)
         // Sort cards after adding to maintain ascending createdAt order
         cards.sort { $0.createdAt < $1.createdAt }
+        return newCard
     }
     
     /// Removes a card (counts are never decremented)

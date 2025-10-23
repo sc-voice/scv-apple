@@ -9,6 +9,7 @@
 "card.at.createdAt" = "Carte à %@";
 "add.card" = "Ajouter une Carte";
 "select.card" = "Sélectionner une carte";
+"close.card" = "Fermer la Carte";
 
 // Card type strings
 "card.type.search" = "Recherche";

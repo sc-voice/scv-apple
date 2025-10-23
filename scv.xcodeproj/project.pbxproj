@@ -497,8 +497,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "sc-voice.net.apple.scvTests";
+				PRODUCT_MODULE_NAME = scvTests;
 				PRODUCT_NAME = "SC-Voice";
-				PRODUCT_MODULE_NAME = "scvTests";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -524,8 +524,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "sc-voice.net.apple.scvTests";
+				PRODUCT_MODULE_NAME = scvTests;
 				PRODUCT_NAME = "SC-Voice";
-				PRODUCT_MODULE_NAME = "scvTests";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -550,8 +550,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "sc-voice.net.apple.scv_UITests";
+				PRODUCT_MODULE_NAME = scv_UITests;
 				PRODUCT_NAME = "SC-Voice";
-				PRODUCT_MODULE_NAME = "scv_UITests";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
@@ -576,8 +576,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 15.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "sc-voice.net.apple.scv_UITests";
+				PRODUCT_MODULE_NAME = scv_UITests;
 				PRODUCT_NAME = "SC-Voice";
-				PRODUCT_MODULE_NAME = "scv_UITests";
 				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";

@@ -11,26 +11,26 @@
   "defaultOptions" : {
     "performanceAntipatternCheckerEnabled" : true,
     "targetForVariableExpansion" : {
-      "containerPath" : "container:scv-apple.xcodeproj",
+      "containerPath" : "container:scv.xcodeproj",
       "identifier" : "F20366AD2EA8F25E00E2C0FC",
-      "name" : "scv-apple"
+      "name" : "scv"
     }
   },
   "testTargets" : [
     {
       "parallelizable" : true,
       "target" : {
-        "containerPath" : "container:scv-apple.xcodeproj",
+        "containerPath" : "container:scv.xcodeproj",
         "identifier" : "F20366BC2EA8F25F00E2C0FC",
-        "name" : "scv-appleTests"
+        "name" : "scvTests"
       }
     },
     {
       "parallelizable" : true,
       "target" : {
-        "containerPath" : "container:scv-apple.xcodeproj",
+        "containerPath" : "container:scv.xcodeproj",
         "identifier" : "F20366C62EA8F25F00E2C0FC",
-        "name" : "scv-appleUITests"
+        "name" : "scv_UITests"
       }
     }
   ],

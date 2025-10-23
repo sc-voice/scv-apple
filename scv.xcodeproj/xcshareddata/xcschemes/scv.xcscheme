@@ -17,8 +17,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F20366AD2EA8F25E00E2C0FC"
                BuildableName = "SC-Voice.app"
-               BlueprintName = "scv-apple"
-               ReferencedContainer = "container:scv-apple.xcodeproj">
+               BlueprintName = "scv"
+               ReferencedContainer = "container:scv.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -30,7 +30,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:scv-apple.xctestplan"
+            reference = "container:scv.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
@@ -42,8 +42,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F20366BC2EA8F25F00E2C0FC"
                BuildableName = "SC-Voice.xctest"
-               BlueprintName = "scv-appleTests"
-               ReferencedContainer = "container:scv-apple.xcodeproj">
+               BlueprintName = "scvTests"
+               ReferencedContainer = "container:scv.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -53,8 +53,8 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F20366C62EA8F25F00E2C0FC"
                BuildableName = "SC-Voice.xctest"
-               BlueprintName = "scv-appleUITests"
-               ReferencedContainer = "container:scv-apple.xcodeproj">
+               BlueprintName = "scv_UITests"
+               ReferencedContainer = "container:scv.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -75,8 +75,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F20366AD2EA8F25E00E2C0FC"
             BuildableName = "SC-Voice.app"
-            BlueprintName = "scv-apple"
-            ReferencedContainer = "container:scv-apple.xcodeproj">
+            BlueprintName = "scv"
+            ReferencedContainer = "container:scv.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -92,8 +92,8 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F20366AD2EA8F25E00E2C0FC"
             BuildableName = "SC-Voice.app"
-            BlueprintName = "scv-apple"
-            ReferencedContainer = "container:scv-apple.xcodeproj">
+            BlueprintName = "scv"
+            ReferencedContainer = "container:scv.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

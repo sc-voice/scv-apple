@@ -1,6 +1,6 @@
 //
 //  scv_appleUITests.swift
-//  scv-appleUITests
+//  scv_UITests
 //
 //  Created by Visakha on 22/10/2025.
 //

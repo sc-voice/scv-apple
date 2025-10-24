@@ -184,22 +184,19 @@ struct CardTests {
             cardManager.syncWithSwiftData([])
             
             // Add first card - should get ID 1
-            let card1 = Card(cardType: CardType.search, name: "First Card")
-            let addedCard1 = cardManager.addCard(card1)
+            let addedCard1 = cardManager.addCard(cardType: .search, name: "First Card")
             #expect(addedCard1.id == 1)
             #expect(addedCard1.cardType == CardType.search)
             #expect(addedCard1.name == "First Card")
             
             // Add second card - should get ID 2
-            let card2 = Card(cardType: CardType.search, name: "Second Card")
-            let addedCard2 = cardManager.addCard(card2)
+            let addedCard2 = cardManager.addCard(cardType: .search, name: "Second Card")
             #expect(addedCard2.id == 2)
             #expect(addedCard2.cardType == CardType.search)
             #expect(addedCard2.name == "Second Card")
             
             // Add card of different type - should get ID 1 for that type
-            let card3 = Card(cardType: CardType.sutta, name: "Sutta Card")
-            let addedCard3 = cardManager.addCard(card3)
+            let addedCard3 = cardManager.addCard(cardType: .sutta, name: "Sutta Card")
             #expect(addedCard3.id == 1)
             #expect(addedCard3.cardType == CardType.sutta)
             #expect(addedCard3.name == "Sutta Card")
@@ -213,15 +210,13 @@ struct CardTests {
             // Clear any existing cards first
             cardManager.syncWithSwiftData([])
             
-            let originalCard = Card(cardType: CardType.search, name: "Original")
-            let addedCard = cardManager.addCard(originalCard)
+            let addedCard = cardManager.addCard(cardType: .search, name: "Test Card")
             
-            // The returned card should be a different instance with the correct ID
-            #expect(addedCard !== originalCard) // Different instances
+            // The returned card should have the correct ID and properties
             #expect(addedCard.id == 1) // Correct ID assigned
-            #expect(originalCard.id == 0) // Original still has default ID
-            #expect(addedCard.cardType == originalCard.cardType)
-            #expect(addedCard.name == originalCard.name)
+            #expect(addedCard.cardType == .search)
+            #expect(addedCard.name == "Test Card")
+            #expect(addedCard.createdAt <= Date()) // Should be recent
         }
     }
     
@@ -232,28 +227,19 @@ struct CardTests {
             // Clear any existing cards first
             cardManager.syncWithSwiftData([])
             
-            // Create multiple cards of each type
-            let searchCard1 = Card(cardType: .search, name: "Search 1")
-            let searchCard2 = Card(cardType: .search, name: "Search 2")
-            let searchCard3 = Card(cardType: .search, name: "Search 3")
-            
-            let suttaCard1 = Card(cardType: .sutta, name: "Sutta 1")
-            let suttaCard2 = Card(cardType: .sutta, name: "Sutta 2")
-            let suttaCard3 = Card(cardType: .sutta, name: "Sutta 3")
-            
             // Add all cards
-            let addedSearchCard1 = cardManager.addCard(searchCard1)
+            let addedSearchCard1 = cardManager.addCard(cardType: .search, name: "Search 1")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedSearchCard2 = cardManager.addCard(searchCard2)
+            let addedSearchCard2 = cardManager.addCard(cardType: .search, name: "Search 2")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedSearchCard3 = cardManager.addCard(searchCard3)
+            let addedSearchCard3 = cardManager.addCard(cardType: .search, name: "Search 3")
             Thread.sleep(forTimeInterval: 0.01)
             
-            let addedSuttaCard1 = cardManager.addCard(suttaCard1)
+            let addedSuttaCard1 = cardManager.addCard(cardType: .sutta, name: "Sutta 1")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedSuttaCard2 = cardManager.addCard(suttaCard2)
+            let addedSuttaCard2 = cardManager.addCard(cardType: .sutta, name: "Sutta 2")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedSuttaCard3 = cardManager.addCard(suttaCard3)
+            let addedSuttaCard3 = cardManager.addCard(cardType: .sutta, name: "Sutta 3")
             
             // Collect all IDs by type
             let searchIds = [addedSearchCard1.id, addedSearchCard2.id, addedSearchCard3.id]
@@ -290,8 +276,7 @@ struct CardTests {
             cardManager.syncWithSwiftData([])
             
             // Simulate the UI behavior: add a card and verify it should be selected
-            let newCard = Card(cardType: CardType.search, name: "New Card")
-            let addedCard = cardManager.addCard(newCard)
+            let addedCard = cardManager.addCard(cardType: .search, name: "New Card")
             
             // Verify the card was added with correct ID
             #expect(addedCard.id == 1)
@@ -304,7 +289,6 @@ struct CardTests {
             
             // Verify the card is ready for selection (has proper ID)
             #expect(addedCard.id > 0) // Card has valid ID for selection
-            #expect(addedCard !== newCard) // Different instance (the one with correct ID)
         }
     }
     
@@ -352,18 +336,14 @@ struct CardTests {
             cardManager.syncWithSwiftData([])
             
             // Create three cards with different creation times
-            let card1 = Card(cardType: CardType.search, name: "First Card")
-            let card2 = Card(cardType: CardType.search, name: "Second Card") 
-            let card3 = Card(cardType: CardType.search, name: "Third Card")
-            
             // Add cards with slight time differences
-            let addedCard1 = cardManager.addCard(card1)
+            let addedCard1 = cardManager.addCard(cardType: .search, name: "First Card")
             Thread.sleep(forTimeInterval: 0.01) // Small delay to ensure different timestamps
             
-            let addedCard2 = cardManager.addCard(card2)
+            let addedCard2 = cardManager.addCard(cardType: .search, name: "Second Card")
             Thread.sleep(forTimeInterval: 0.01)
             
-            let addedCard3 = cardManager.addCard(card3)
+            let addedCard3 = cardManager.addCard(cardType: .search, name: "Third Card")
             
             // Verify cards were added with correct IDs
             #expect(addedCard1.id == 1)
@@ -393,12 +373,9 @@ struct CardTests {
             cardManager.syncWithSwiftData([])
             
             // Create two cards
-            let card1 = Card(cardType: CardType.search, name: "First Card")
-            let card2 = Card(cardType: CardType.search, name: "Second Card")
-            
-            let addedCard1 = cardManager.addCard(card1)
+            let addedCard1 = cardManager.addCard(cardType: .search, name: "First Card")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedCard2 = cardManager.addCard(card2)
+            let addedCard2 = cardManager.addCard(cardType: .search, name: "Second Card")
             
             // Simulate selecting the last card (card2)
             let selectedCard = addedCard2
@@ -423,8 +400,7 @@ struct CardTests {
             cardManager.syncWithSwiftData([])
             
             // Create only one card
-            let card1 = Card(cardType: CardType.search, name: "Only Card")
-            let addedCard1 = cardManager.addCard(card1)
+            let addedCard1 = cardManager.addCard(cardType: .search, name: "Only Card")
             
             // Simulate deleting the only card
             let remainingCards: [Card] = []
@@ -443,15 +419,11 @@ struct CardTests {
             cardManager.syncWithSwiftData([])
             
             // Create cards in a specific order
-            let card1 = Card(cardType: CardType.search, name: "Card 1")
-            let card2 = Card(cardType: CardType.search, name: "Card 2")
-            let card3 = Card(cardType: CardType.search, name: "Card 3")
-            
-            let addedCard1 = cardManager.addCard(card1)
+            let addedCard1 = cardManager.addCard(cardType: .search, name: "Card 1")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedCard2 = cardManager.addCard(card2)
+            let addedCard2 = cardManager.addCard(cardType: .search, name: "Card 2")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedCard3 = cardManager.addCard(card3)
+            let addedCard3 = cardManager.addCard(cardType: .search, name: "Card 3")
             
             // Verify creation order
             #expect(addedCard1.createdAt < addedCard2.createdAt)
@@ -485,12 +457,9 @@ struct CardTests {
             cardManager.syncWithSwiftData([])
             
             // Create test cards
-            let card1 = Card(cardType: CardType.search, name: "First Card")
-            let card2 = Card(cardType: CardType.search, name: "Second Card")
-            
-            let addedCard1 = cardManager.addCard(card1)
+            let addedCard1 = cardManager.addCard(cardType: .search, name: "First Card")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedCard2 = cardManager.addCard(card2)
+            let addedCard2 = cardManager.addCard(cardType: .search, name: "Second Card")
             
             // Simulate the selection behavior from ContentView
             var selectedCard: Card? = nil
@@ -530,15 +499,11 @@ struct CardTests {
             cardManager.syncWithSwiftData([])
             
             // Create test cards
-            let card1 = Card(cardType: CardType.search, name: "Test Card 1")
-            let card2 = Card(cardType: CardType.search, name: "Test Card 2")
-            let card3 = Card(cardType: CardType.search, name: "Test Card 3")
-            
-            let addedCard1 = cardManager.addCard(card1)
+            let addedCard1 = cardManager.addCard(cardType: .search, name: "Test Card 1")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedCard2 = cardManager.addCard(card2)
+            let addedCard2 = cardManager.addCard(cardType: .search, name: "Test Card 2")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedCard3 = cardManager.addCard(card3)
+            let addedCard3 = cardManager.addCard(cardType: .search, name: "Test Card 3")
             
             // Simulate ContentView selection behavior
             var selectedCard: Card? = nil
@@ -578,12 +543,9 @@ struct CardTests {
             cardManager.syncWithSwiftData([])
             
             // Create test cards
-            let card1 = Card(cardType: CardType.search, name: "Focus Card 1")
-            let card2 = Card(cardType: CardType.search, name: "Focus Card 2")
-            
-            let addedCard1 = cardManager.addCard(card1)
+            let addedCard1 = cardManager.addCard(cardType: .search, name: "Focus Card 1")
             Thread.sleep(forTimeInterval: 0.01)
-            let addedCard2 = cardManager.addCard(card2)
+            let addedCard2 = cardManager.addCard(cardType: .search, name: "Focus Card 2")
             
             // Simulate focus state tracking
             var focusedCardId: Int? = nil

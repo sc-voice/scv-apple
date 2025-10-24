@@ -53,7 +53,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F20366C62EA8F25F00E2C0FC"
                BuildableName = "SC-Voice.xctest"
-               BlueprintName = "scv_UITests"
+               BlueprintName = "scvUITests"
                ReferencedContainer = "container:scv.xcodeproj">
             </BuildableReference>
          </TestableReference>

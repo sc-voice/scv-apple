@@ -138,8 +138,9 @@ struct ContentView: View {
 
     private func addCard() {
         withAnimation {
-            let newCard = Card()
-            let cardWithId = cardManager.addCard(newCard)
+            // Determine card type: alternating between search and sutta
+            let cardType: CardType = persistedCards.count % 2 == 0 ? .search : .sutta
+            let cardWithId = cardManager.addCard(cardType: cardType, name: "")
             modelContext.insert(cardWithId)
           
           // Save changes to persist to disk first

@@ -30,7 +30,7 @@
       "target" : {
         "containerPath" : "container:scv.xcodeproj",
         "identifier" : "F20366C62EA8F25F00E2C0FC",
-        "name" : "scv_UITests"
+        "name" : "scvUITests"
       }
     }
   ],

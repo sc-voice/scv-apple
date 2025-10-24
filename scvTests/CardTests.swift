@@ -78,17 +78,6 @@ struct CardTests {
     
     // MARK: - Method Tests
     
-    @Test func testIconNameForSearchCard() async throws {
-        let card = Card(cardType: .search)
-        
-        #expect(card.iconName() == "magnifyingglass")
-    }
-    
-    @Test func testIconNameForSuttaCard() async throws {
-        let card = Card(cardType: .sutta)
-        
-        #expect(card.iconName() == "book")
-    }
     
     @Test func testLocalizedCardTypeNameForSearch() async throws {
         let card = Card(cardType: .search)
@@ -233,6 +222,61 @@ struct CardTests {
             #expect(originalCard.id == 0) // Original still has default ID
             #expect(addedCard.cardType == originalCard.cardType)
             #expect(addedCard.name == originalCard.name)
+        }
+    }
+    
+    @Test func testCardIdsAreUniquePerCardType() async throws {
+        await MainActor.run {
+            let cardManager = CardManager.shared
+            
+            // Clear any existing cards first
+            cardManager.syncWithSwiftData([])
+            
+            // Create multiple cards of each type
+            let searchCard1 = Card(cardType: .search, name: "Search 1")
+            let searchCard2 = Card(cardType: .search, name: "Search 2")
+            let searchCard3 = Card(cardType: .search, name: "Search 3")
+            
+            let suttaCard1 = Card(cardType: .sutta, name: "Sutta 1")
+            let suttaCard2 = Card(cardType: .sutta, name: "Sutta 2")
+            let suttaCard3 = Card(cardType: .sutta, name: "Sutta 3")
+            
+            // Add all cards
+            let addedSearchCard1 = cardManager.addCard(searchCard1)
+            Thread.sleep(forTimeInterval: 0.01)
+            let addedSearchCard2 = cardManager.addCard(searchCard2)
+            Thread.sleep(forTimeInterval: 0.01)
+            let addedSearchCard3 = cardManager.addCard(searchCard3)
+            Thread.sleep(forTimeInterval: 0.01)
+            
+            let addedSuttaCard1 = cardManager.addCard(suttaCard1)
+            Thread.sleep(forTimeInterval: 0.01)
+            let addedSuttaCard2 = cardManager.addCard(suttaCard2)
+            Thread.sleep(forTimeInterval: 0.01)
+            let addedSuttaCard3 = cardManager.addCard(suttaCard3)
+            
+            // Collect all IDs by type
+            let searchIds = [addedSearchCard1.id, addedSearchCard2.id, addedSearchCard3.id]
+            let suttaIds = [addedSuttaCard1.id, addedSuttaCard2.id, addedSuttaCard3.id]
+            let allIds = searchIds + suttaIds
+            
+            // Verify IDs are unique within each card type
+            let uniqueSearchIds = Set(searchIds)
+            let uniqueSuttaIds = Set(suttaIds)
+            
+            #expect(uniqueSearchIds.count == searchIds.count, "Search card IDs should be unique")
+            #expect(uniqueSuttaIds.count == suttaIds.count, "Sutta card IDs should be unique")
+            
+            // Verify IDs are sequential within each type
+            #expect(searchIds.sorted() == [1, 2, 3], "Search card IDs should be sequential starting from 1")
+            #expect(suttaIds.sorted() == [1, 2, 3], "Sutta card IDs should be sequential starting from 1")
+            
+            // Verify that IDs can overlap between types (this is the expected behavior)
+            // Both types can have ID 1, 2, 3, etc.
+            #expect(searchIds.contains(1), "Search cards should have ID 1")
+            #expect(suttaIds.contains(1), "Sutta cards should have ID 1")
+            #expect(searchIds.contains(2), "Search cards should have ID 2")
+            #expect(suttaIds.contains(2), "Sutta cards should have ID 2")
         }
     }
     

@@ -1,0 +1,20 @@
+/* 
+  Localizable.strings
+  SC-Voice
+
+  Created by Visakha on 22/10/2025.
+*/
+
+// Card-related strings
+"card.at.createdAt" = "Karte um %@";
+"add.card" = "Karte hinzufügen";
+"select.card" = "Wählen Sie eine Karte";
+"close.card" = "Karte schließen";
+
+// Card type strings
+"card.type.search" = "Suche";
+"card.type.sutta" = "Sutta";
+
+// Error messages
+"model.container.error" = "ModelContainer konnte nicht erstellt werden: %@";
+

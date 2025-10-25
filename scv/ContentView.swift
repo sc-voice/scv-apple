@@ -30,8 +30,10 @@ struct ContentView: View {
             Image(systemName: card.iconName())
               .foregroundColor(.blue)
               .frame(width: 20)
+              .accessibilityIdentifier("icon_\(card.cardType.rawValue)_\(card.typeId)")
 
             Text(cardTitle(for: card))
+              .accessibilityIdentifier("card_\(card.cardType.rawValue)_\(card.typeId)")
 
             Spacer()
 
@@ -73,27 +75,16 @@ struct ContentView: View {
           Button(action: addCard) {
             Label("add.card".localized, systemImage: "plus")
           }
+          .accessibilityIdentifier("addCardButton")
         }
       }
     } detail: {
       if let selectedCard = selectedCard {
         switch selectedCard.cardType {
         case .search:
-          SearchView(card: Binding(
-            get: { selectedCard },
-            set: { newValue in
-              // Update the selected card
-              self.selectedCard = newValue
-            }
-          ))
+          SearchView(card: selectedCard)
         case .sutta:
-          SuttaView(card: Binding(
-            get: { selectedCard },
-            set: { newValue in
-              // Update the selected card
-              self.selectedCard = newValue
-            }
-          ))
+          SuttaView(card: selectedCard)
         }
       } else {
         Text("select.card".localized)

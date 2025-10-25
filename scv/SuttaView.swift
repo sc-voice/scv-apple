@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SuttaView: View {
-  @Binding var card: Card
+  @Bindable var card: Card
   @State private var isLoading = false
   @State private var errorMessage: String?
   @State private var suttaData: MLDocument?
@@ -51,11 +51,13 @@ struct SuttaView: View {
         .onSubmit {
           loadSutta()
         }
+        .accessibilityIdentifier("suttaTextField")
       
       Button(action: loadSutta) {
         Label("sutta.load.button".localized, systemImage: "book")
       }
       .disabled(card.suttaReference.isEmpty || isLoading)
+      .accessibilityIdentifier("loadSuttaButton")
     }
     .padding()
   }
@@ -164,6 +166,7 @@ struct SuttaView: View {
       
       Text("sutta.placeholder.title".localized)
         .font(.title2)
+        .accessibilityIdentifier("suttaPlaceholderTitle")
       
       Text("sutta.placeholder.message".localized)
         .font(.body)
@@ -297,12 +300,12 @@ struct SuttaView: View {
 // MARK: - Preview
 
 #Preview {
-  @Previewable @State var card = Card(
+  let card = Card(
     cardType: .sutta,
     typeId: 1,
     suttaReference: "mn1"
   )
   
-  return SuttaView(card: $card)
+  return SuttaView(card: card)
 }
 

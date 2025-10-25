@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SearchView: View {
-  @Binding var card: Card
+  @Bindable var card: Card
   @State private var isSearching = false
   @State private var errorMessage: String?
   @State private var searchResponse: SearchResponse?
@@ -48,11 +48,13 @@ struct SearchView: View {
         .onSubmit {
           performSearch()
         }
+        .accessibilityIdentifier("searchTextField")
       
       Button(action: performSearch) {
         Label("search.button".localized, systemImage: "magnifyingglass")
       }
       .disabled(card.searchQuery.isEmpty || isSearching)
+      .accessibilityIdentifier("searchButton")
     }
     .padding()
   }
@@ -159,6 +161,7 @@ struct SearchView: View {
       
       Text("search.placeholder.title".localized)
         .font(.title2)
+        .accessibilityIdentifier("searchPlaceholderTitle")
       
       Text("search.placeholder.message".localized)
         .font(.body)
@@ -272,12 +275,12 @@ struct SearchView: View {
 // MARK: - Preview
 
 #Preview {
-  @Previewable @State var card = Card(
+  let card = Card(
     cardType: .search,
     typeId: 1,
     searchQuery: "root of suffering"
   )
   
-  return SearchView(card: $card)
+  return SearchView(card: card)
 }
 

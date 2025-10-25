@@ -9,21 +9,23 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-  @State private var cardManager = CardManager.shared
+  @State private var cardManager: CardManager?
   @Environment(\.modelContext) private var modelContext
-  @Query(sort: \Card.createdAt, order: .forward) private var persistedCards:
-    [Card]
   @Environment(\.locale) private var locale
   @State private var selectedCards: Set<Card.ID> = []
   @State private var selectedCard: Card?
   @FocusState private var focusedCardId: Card.ID?
 
   private let selectedCardKey = "SelectedCardID"
+  
+  private var allCards: [Card] {
+    cardManager?.allCards ?? []
+  }
 
   var body: some View {
     NavigationSplitView {
       List(selection: $selectedCard) {
-        ForEach(persistedCards) { card in
+        ForEach(allCards) { card in
           HStack {
             Image(systemName: card.iconName())
               .foregroundColor(.blue)
@@ -81,12 +83,11 @@ struct ContentView: View {
       }
     }
     .onAppear {
-      // Sync CardManager with SwiftData when view appears
-      cardManager.syncWithSwiftData(persistedCards)
-    }
-    .onChange(of: persistedCards) { _, newCards in
-      // Sync CardManager whenever SwiftData cards change
-      cardManager.syncWithSwiftData(newCards)
+      // Initialize CardManager with ModelContext
+      if cardManager == nil {
+        cardManager = CardManager(modelContext: modelContext)
+      }
+      restoreSelectedCard()
     }
     .onChange(of: selectedCard) { _, newSelectedCard in
       // Sync selectedCards with selectedCard for "X" button display
@@ -99,9 +100,6 @@ struct ContentView: View {
         focusedCardId = nil  // Clear focus when no card is selected
         saveSelectedCard(nil)
       }
-    }
-    .onAppear {
-      restoreSelectedCard()
     }
   }
 
@@ -130,7 +128,7 @@ struct ContentView: View {
     guard savedCardId != 0 else { return }
 
     // Find the card with the saved ID
-    if let card = persistedCards.first(where: { $0.id == savedCardId }) {
+    if let card = allCards.first(where: { $0.id == savedCardId }) {
       selectedCard = card
       selectedCards = [card.id]
       focusedCardId = card.id  // Restore focus to the saved card
@@ -140,44 +138,26 @@ struct ContentView: View {
   private func addCard() {
     withAnimation {
       // Determine card type: alternating between search and sutta
-      let cardType: CardType = persistedCards.count % 2 == 0 ? .search : .sutta
-      let cardWithId = cardManager.addCard(cardType: cardType, name: "")
-      modelContext.insert(cardWithId)
+      let cardType: CardType = allCards.count % 2 == 0 ? .search : .sutta
+      let cardWithId = cardManager?.addCard(cardType: cardType, name: "")
 
-      // Save changes to persist to disk first
-      do {
-        try modelContext.save()
-
-        // Select the newly created card after it's saved
+      // Select the newly created card after it's saved
+      if let cardWithId = cardWithId {
         selectedCard = cardWithId
         selectedCards = [cardWithId.id]
         focusedCardId = cardWithId.id  // Set focus to the new card
-      } catch {
-        print("Failed to save context: \(error)")
       }
     }
   }
 
   private func deleteCards(offsets: IndexSet) {
     withAnimation {
-      for index in offsets {
-        let card = persistedCards[index]
-        modelContext.delete(card)
-      }
-
-      // Save changes to persist to disk
-      do {
-        try modelContext.save()
-      } catch {
-        print("Failed to save context: \(error)")
-      }
+      cardManager?.removeCards(at: offsets)
     }
   }
 
   private func deleteCard(_ card: Card) {
     withAnimation {
-      modelContext.delete(card)
-
       // Remove from selection
       selectedCards.remove(card.id)
 
@@ -194,18 +174,14 @@ struct ContentView: View {
         }
       }
 
-      // Save changes to persist to disk
-      do {
-        try modelContext.save()
-      } catch {
-        print("Failed to save context: \(error)")
-      }
+      // Delete the card using CardManager
+      cardManager?.removeCard(card)
     }
   }
 
   /// Finds the next card to select after deleting a card
   private func findNextCard(after deletedCard: Card) -> Card? {
-    let remainingCards = persistedCards.filter { $0.id != deletedCard.id }
+    let remainingCards = allCards.filter { $0.id != deletedCard.id }
 
     // If no cards remain, return nil
     guard !remainingCards.isEmpty else { return nil }
@@ -231,39 +207,33 @@ struct ContentView: View {
 
     withAnimation {
       // Find the next card to select after deletion
-      let sortedCards = persistedCards.sorted { $0.createdAt < $1.createdAt }
+      let sortedCards = allCards.sorted { $0.createdAt < $1.createdAt }
       let currentIndex = sortedCards.firstIndex { $0.id == cardToDelete.id }
 
-      modelContext.delete(cardToDelete)
+      // Delete the card using CardManager
+      cardManager?.removeCard(cardToDelete)
 
-      // Save changes first to update the persisted cards
-      do {
-        try modelContext.save()
+      // Now select the next card from the updated list
+      let updatedCards = allCards.sorted { $0.createdAt < $1.createdAt }
 
-        // Now select the next card from the updated list
-        let updatedCards = persistedCards.sorted { $0.createdAt < $1.createdAt }
-
-        if let currentIndex = currentIndex, !updatedCards.isEmpty {
-          let nextIndex =
-            currentIndex < updatedCards.count
-            ? currentIndex : max(0, updatedCards.count - 1)
-          if nextIndex >= 0, nextIndex < updatedCards.count {
-            let nextCard = updatedCards[nextIndex]
-            selectedCard = nextCard
-            selectedCards = [nextCard.id]
-            focusedCardId = nextCard.id  // Set focus to the next card
-          } else {
-            selectedCard = nil
-            selectedCards = []
-            focusedCardId = nil  // Clear focus when no cards remain
-          }
+      if let currentIndex = currentIndex, !updatedCards.isEmpty {
+        let nextIndex =
+          currentIndex < updatedCards.count
+          ? currentIndex : max(0, updatedCards.count - 1)
+        if nextIndex >= 0, nextIndex < updatedCards.count {
+          let nextCard = updatedCards[nextIndex]
+          selectedCard = nextCard
+          selectedCards = [nextCard.id]
+          focusedCardId = nextCard.id  // Set focus to the next card
         } else {
           selectedCard = nil
           selectedCards = []
           focusedCardId = nil  // Clear focus when no cards remain
         }
-      } catch {
-        print("Failed to save context: \(error)")
+      } else {
+        selectedCard = nil
+        selectedCards = []
+        focusedCardId = nil  // Clear focus when no cards remain
       }
     }
   }
@@ -275,8 +245,8 @@ struct ContentView: View {
 
     withAnimation {
       for cardId in selectedCards {
-        if let card = persistedCards.first(where: { $0.id == cardId }) {
-          modelContext.delete(card)
+        if let card = allCards.first(where: { $0.id == cardId }) {
+          cardManager?.removeCard(card)
         }
       }
 
@@ -284,13 +254,6 @@ struct ContentView: View {
       selectedCards.removeAll()
       selectedCard = nil
       focusedCardId = nil  // Clear focus after deletion
-
-      // Save changes to persist to disk
-      do {
-        try modelContext.save()
-      } catch {
-        print("Failed to save context: \(error)")
-      }
     }
   }
 }

@@ -80,48 +80,47 @@ final class Card {
 
 // MARK: - CardManager
 
-/// Singleton manager for Card instances
+/// Instance-based manager for Card instances with ModelContext integration
 @Observable
 class CardManager {
   // MARK: - Properties
 
-  static let shared = CardManager()
-
-  private var cards: [Card] = []
+  private let modelContext: ModelContext
 
   // MARK: - Initialization
 
-  private init() {
-    // No initialization needed
+  init(modelContext: ModelContext) {
+    self.modelContext = modelContext
   }
 
   // MARK: - Public Properties
 
   /// Returns all cards sorted by createdAt in ascending order
   var allCards: [Card] {
-    return cards.sorted { $0.createdAt < $1.createdAt }
+    let fetchDescriptor = FetchDescriptor<Card>(sortBy: [SortDescriptor(\.createdAt, order: .forward)])
+    do {
+      return try modelContext.fetch(fetchDescriptor)
+    } catch {
+      print("Failed to fetch cards: \(error)")
+      return []
+    }
   }
 
   /// Returns total count of all cards
   var totalCount: Int {
-    return cards.count
+    return allCards.count
   }
 
   // MARK: - Public Methods
 
-  /// Syncs CardManager with SwiftData cards
-  func syncWithSwiftData(_ swiftDataCards: [Card]) {
-    cards = swiftDataCards.sorted { $0.createdAt < $1.createdAt }
-  }
-
   /// Returns count for a specific card type
   func count(for cardType: CardType) -> Int {
-    return cards.filter { $0.cardType == cardType }.count
+    return allCards.filter { $0.cardType == cardType }.count
   }
 
   /// Returns the largest ID for a specific card type, or 0 if no cards exist
   func largestId(for cardType: CardType) -> Int {
-    let cardsOfType = cards.filter { $0.cardType == cardType }
+    let cardsOfType = allCards.filter { $0.cardType == cardType }
     return cardsOfType.map { $0.id }.max() ?? 0
   }
 
@@ -136,25 +135,32 @@ class CardManager {
       id: largestId(for: cardType) + 1
     )
 
-    cards.append(newCard)
+    modelContext.insert(newCard)
 
-    // Sort cards after adding to maintain ascending createdAt order
-    cards.sort { $0.createdAt < $1.createdAt }
+    do {
+      try modelContext.save()
+    } catch {
+      print("Failed to save card: \(error)")
+    }
 
     return newCard
   }
 
   /// Removes a card (counts are never decremented)
   func removeCard(_ card: Card) {
-    if let index = cards.firstIndex(where: { $0 === card }) {
-      cards.remove(at: index)
-      // Counts are never decremented - they only track total created
+    modelContext.delete(card)
+
+    do {
+      try modelContext.save()
+    } catch {
+      print("Failed to delete card: \(error)")
     }
   }
 
   /// Removes cards at specified indices
   func removeCards(at indices: IndexSet) {
-    for index in indices.reversed() {
+    let cards = allCards
+    for index in indices {
       if index < cards.count {
         let card = cards[index]
         removeCard(card)

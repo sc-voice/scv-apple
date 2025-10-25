@@ -6,11 +6,20 @@
 //
 
 import Foundation
+import SwiftData
 import Testing
 
 @testable import SC_Voice
 
 struct CardTests {
+
+  // MARK: - Test Helpers
+  
+  private func createInMemoryContainer() throws -> ModelContainer {
+    let schema = Schema([Card.self])
+    let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+    return try ModelContainer(for: schema, configurations: [configuration])
+  }
 
   // MARK: - Initialization Tests
 
@@ -183,10 +192,8 @@ struct CardTests {
 
   @Test func testCardManagerAddCardAssignsCorrectId() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Add first card - should get ID 1
       let addedCard1 = cardManager.addCard(
@@ -216,10 +223,8 @@ struct CardTests {
 
   @Test func testCardManagerAddCardReturnsNewCardInstance() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       let addedCard = cardManager.addCard(cardType: .search, name: "Test Card")
 
@@ -233,10 +238,8 @@ struct CardTests {
 
   @Test func testCardIdsAreUniquePerCardType() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Add all cards
       let addedSearchCard1 = cardManager.addCard(
@@ -315,10 +318,8 @@ struct CardTests {
 
   @Test func testNewCardIsSelectedAfterAdding() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Simulate the UI behavior: add a card and verify it should be selected
       let addedCard = cardManager.addCard(cardType: .search, name: "New Card")
@@ -379,10 +380,8 @@ struct CardTests {
 
   @Test func testNextCardSelectedWhenMiddleCardDeleted() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create three cards with different creation times
       // Add cards with slight time differences
@@ -425,10 +424,8 @@ struct CardTests {
 
   @Test func testLastCardSelectedWhenLastCardDeleted() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create two cards
       let addedCard1 = cardManager.addCard(
@@ -458,10 +455,8 @@ struct CardTests {
 
   @Test func testNoCardSelectedWhenOnlyCardDeleted() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create only one card
       let addedCard1 = cardManager.addCard(cardType: .search, name: "Only Card")
@@ -477,10 +472,8 @@ struct CardTests {
 
   @Test func testCardSelectionOrderByCreationTime() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create cards in a specific order
       let addedCard1 = cardManager.addCard(cardType: .search, name: "Card 1")
@@ -520,10 +513,8 @@ struct CardTests {
 
   @Test func testCardSelectionUpdatesFocusState() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create test cards
       let addedCard1 = cardManager.addCard(
@@ -568,10 +559,8 @@ struct CardTests {
 
   @Test func testCardSelectionStateConsistency() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create test cards
       let addedCard1 = cardManager.addCard(
@@ -621,10 +610,8 @@ struct CardTests {
 
   @Test func testCardSelectionTriggersFocusChange() async throws {
     await MainActor.run {
-      let cardManager = CardManager.shared
-
-      // Clear any existing cards first
-      cardManager.syncWithSwiftData([])
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create test cards
       let addedCard1 = cardManager.addCard(

@@ -23,21 +23,21 @@ final class Card {
 
   private(set) var createdAt: Date
   private(set) var cardType: CardType
-  var name: String
-  private(set) var id: Int
+  var name: String {
+    return "\(localizedCardTypeName()) \(typeId)"
+  }
+  private(set) var typeId: Int
 
   // MARK: - Initialization
 
   init(
     createdAt: Date = Date(),
     cardType: CardType = .search,
-    name: String = "",
-    id: Int = 0
+    typeId: Int = 0
   ) {
     self.createdAt = createdAt
     self.cardType = cardType
-    self.name = name
-    self.id = id
+    self.typeId = typeId
   }
 
   // MARK: - Public Methods
@@ -64,18 +64,10 @@ final class Card {
 
   /// Returns the display title for the card
   func title() -> String {
-    if !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-      return name
-    } else {
-      // Always return localized CardType + ID (don't store in name)
-      return "\(localizedCardTypeName()) \(id)"
-    }
+    // Always return localized CardType + ID (don't store in name)
+    return "\(localizedCardTypeName()) \(typeId)"
   }
 
-  /// Returns the card's unique ID
-  func getId() -> Int {
-    return id
-  }
 }
 
 // MARK: - CardManager
@@ -97,7 +89,9 @@ class CardManager {
 
   /// Returns all cards sorted by createdAt in ascending order
   var allCards: [Card] {
-    let fetchDescriptor = FetchDescriptor<Card>(sortBy: [SortDescriptor(\.createdAt, order: .forward)])
+    let fetchDescriptor = FetchDescriptor<Card>(sortBy: [
+      SortDescriptor(\.createdAt, order: .forward)
+    ])
     do {
       return try modelContext.fetch(fetchDescriptor)
     } catch {
@@ -121,18 +115,17 @@ class CardManager {
   /// Returns the largest ID for a specific card type, or 0 if no cards exist
   func largestId(for cardType: CardType) -> Int {
     let cardsOfType = allCards.filter { $0.cardType == cardType }
-    return cardsOfType.map { $0.id }.max() ?? 0
+    return cardsOfType.map { $0.typeId }.max() ?? 0
   }
 
   /// Adds a new card and returns the card with the assigned ID
   @discardableResult
-  func addCard(cardType: CardType = .search, name: String = "") -> Card {
+  func addCard(cardType: CardType = .search) -> Card {
     // Create a new card with the correct ID
     let newCard = Card(
       createdAt: Date(),
       cardType: cardType,
-      name: name,
-      id: largestId(for: cardType) + 1
+      typeId: largestId(for: cardType) + 1
     )
 
     modelContext.insert(newCard)

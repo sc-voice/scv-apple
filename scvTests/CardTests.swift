@@ -27,8 +27,9 @@ struct CardTests {
     let card = Card()
 
     #expect(card.cardType == .search)
-    #expect(card.name == "")
-    #expect(card.id == 0)
+    #expect(card.name.contains("card.type.search".localized))
+    #expect(card.name.contains("0"))
+    #expect(card.typeId == 0)
     #expect(card.createdAt.timeIntervalSinceNow < 1.0)  // Should be recent
   }
 
@@ -37,22 +38,21 @@ struct CardTests {
     let card = Card(
       createdAt: date,
       cardType: .sutta,
-      name: "Test Card",
-      id: 42
+      typeId: 42
     )
 
     #expect(card.createdAt == date)
     #expect(card.cardType == .sutta)
-    #expect(card.name == "Test Card")
-    #expect(card.id == 42)
+    #expect(card.name.contains("card.type.sutta".localized))
+    #expect(card.name.contains("42"))
+    #expect(card.typeId == 42)
   }
 
   @Test func testPartialInitialization() async throws {
-    let card = Card(cardType: .sutta, name: "Partial Test")
+    let card = Card(cardType: .sutta)
 
     #expect(card.cardType == .sutta)
-    #expect(card.name == "Partial Test")
-    #expect(card.id == 0)  // Default value
+    #expect(card.typeId == 0)  // Default value
     #expect(card.createdAt.timeIntervalSinceNow < 1.0)  // Should be recent
   }
 
@@ -76,19 +76,9 @@ struct CardTests {
   }
 
   @Test func testIdImmutability() async throws {
-    let card = Card(id: 123)
+    let card = Card(typeId: 123)
 
-    #expect(card.id == 123)
-  }
-
-  @Test func testNameMutability() async throws {
-    let card = Card(name: "Original Name")
-
-    #expect(card.name == "Original Name")
-
-    // Name should be mutable
-    card.name = "Updated Name"
-    #expect(card.name == "Updated Name")
+    #expect(card.typeId == 123)
   }
 
   // MARK: - Method Tests
@@ -108,24 +98,12 @@ struct CardTests {
     #expect(localizedName == "card.type.sutta".localized)
   }
 
-  @Test func testTitleWithName() async throws {
-    let card = Card(name: "Custom Card Name")
-
-    #expect(card.title() == "Custom Card Name")
-  }
-
-  @Test func testTitleWithoutName() async throws {
-    let card = Card(cardType: .search, name: "", id: 5)
+  @Test func testTitle() async throws {
+    let card = Card(cardType: .search, typeId: 5)
 
     let title = card.title()
     #expect(title.contains("card.type.search".localized))
     #expect(title.contains("5"))
-  }
-
-  @Test func testGetId() async throws {
-    let card = Card(id: 999)
-
-    #expect(card.getId() == 999)
   }
 
   // MARK: - CardType Enum Tests
@@ -158,7 +136,7 @@ struct CardTests {
   // MARK: - Edge Cases
 
   @Test func testEmptyNameTitle() async throws {
-    let card = Card(cardType: .sutta, name: "", id: 0)
+    let card = Card(cardType: .sutta, typeId: 0)
 
     let title = card.title()
     #expect(title.contains("card.type.sutta".localized))
@@ -166,7 +144,7 @@ struct CardTests {
   }
 
   @Test func testWhitespaceNameTitle() async throws {
-    let card = Card(cardType: .search, name: "   ", id: 1)
+    let card = Card(cardType: .search, typeId: 1)
 
     // Empty name should fall back to localized type + ID
     let title = card.title()
@@ -175,17 +153,15 @@ struct CardTests {
   }
 
   @Test func testNegativeId() async throws {
-    let card = Card(id: -1)
+    let card = Card(typeId: -1)
 
-    #expect(card.id == -1)
-    #expect(card.getId() == -1)
+    #expect(card.typeId == -1)
   }
 
   @Test func testLargeId() async throws {
-    let card = Card(id: Int.max)
+    let card = Card(typeId: Int.max)
 
-    #expect(card.id == Int.max)
-    #expect(card.getId() == Int.max)
+    #expect(card.typeId == Int.max)
   }
 
   // MARK: - CardManager Tests
@@ -198,26 +174,21 @@ struct CardTests {
       // Add first card - should get ID 1
       let addedCard1 = cardManager.addCard(
         cardType: .search,
-        name: "First Card"
       )
-      #expect(addedCard1.id == 1)
+      #expect(addedCard1.typeId == 1)
       #expect(addedCard1.cardType == CardType.search)
-      #expect(addedCard1.name == "First Card")
 
       // Add second card - should get ID 2
       let addedCard2 = cardManager.addCard(
         cardType: .search,
-        name: "Second Card"
       )
-      #expect(addedCard2.id == 2)
+      #expect(addedCard2.typeId == 2)
       #expect(addedCard2.cardType == CardType.search)
-      #expect(addedCard2.name == "Second Card")
 
       // Add card of different type - should get ID 1 for that type
-      let addedCard3 = cardManager.addCard(cardType: .sutta, name: "Sutta Card")
-      #expect(addedCard3.id == 1)
+      let addedCard3 = cardManager.addCard(cardType: .sutta)
+      #expect(addedCard3.typeId == 1)
       #expect(addedCard3.cardType == CardType.sutta)
-      #expect(addedCard3.name == "Sutta Card")
     }
   }
 
@@ -226,12 +197,12 @@ struct CardTests {
       let container = try! createInMemoryContainer()
       let cardManager = CardManager(modelContext: container.mainContext)
 
-      let addedCard = cardManager.addCard(cardType: .search, name: "Test Card")
+      let addedCard = cardManager.addCard(cardType: .search)
 
       // The returned card should have the correct ID and properties
-      #expect(addedCard.id == 1)  // Correct ID assigned
+      #expect(addedCard.typeId == 1)  // Correct ID assigned
       #expect(addedCard.cardType == .search)
-      #expect(addedCard.name == "Test Card")
+      #expect(addedCard.name.contains("card.type.search".localized))
       #expect(addedCard.createdAt <= Date())  // Should be recent
     }
   }
@@ -242,45 +213,26 @@ struct CardTests {
       let cardManager = CardManager(modelContext: container.mainContext)
 
       // Add all cards
-      let addedSearchCard1 = cardManager.addCard(
-        cardType: .search,
-        name: "Search 1"
-      )
+      let addedSearchCard1 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedSearchCard2 = cardManager.addCard(
-        cardType: .search,
-        name: "Search 2"
-      )
+      let addedSearchCard2 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedSearchCard3 = cardManager.addCard(
-        cardType: .search,
-        name: "Search 3"
-      )
+      let addedSearchCard3 = cardManager.addCard(cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
 
-      let addedSuttaCard1 = cardManager.addCard(
-        cardType: .sutta,
-        name: "Sutta 1"
-      )
+      let addedSuttaCard1 = cardManager.addCard( cardType: .sutta)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedSuttaCard2 = cardManager.addCard(
-        cardType: .sutta,
-        name: "Sutta 2"
-      )
+      let addedSuttaCard2 = cardManager.addCard( cardType: .sutta )
       Thread.sleep(forTimeInterval: 0.01)
-      let addedSuttaCard3 = cardManager.addCard(
-        cardType: .sutta,
-        name: "Sutta 3"
-      )
+      let addedSuttaCard3 = cardManager.addCard( cardType: .sutta )
 
       // Collect all IDs by type
       let searchIds = [
-        addedSearchCard1.id, addedSearchCard2.id, addedSearchCard3.id,
+        addedSearchCard1.typeId, addedSearchCard2.typeId, addedSearchCard3.typeId,
       ]
       let suttaIds = [
-        addedSuttaCard1.id, addedSuttaCard2.id, addedSuttaCard3.id,
+        addedSuttaCard1.typeId, addedSuttaCard2.typeId, addedSuttaCard3.typeId,
       ]
-      let allIds = searchIds + suttaIds
 
       // Verify IDs are unique within each card type
       let uniqueSearchIds = Set(searchIds)
@@ -322,19 +274,18 @@ struct CardTests {
       let cardManager = CardManager(modelContext: container.mainContext)
 
       // Simulate the UI behavior: add a card and verify it should be selected
-      let addedCard = cardManager.addCard(cardType: .search, name: "New Card")
+      let addedCard = cardManager.addCard(cardType: .search)
 
       // Verify the card was added with correct ID
-      #expect(addedCard.id == 1)
+      #expect(addedCard.typeId == 1)
       #expect(addedCard.cardType == CardType.search)
-      #expect(addedCard.name == "New Card")
 
       // In the UI, this card should be selected after adding
       // The test verifies that the card returned by addCard() is the one that should be selected
       // This ensures the UI selects the card with the correct ID, not the original card with ID 0
 
       // Verify the card is ready for selection (has proper ID)
-      #expect(addedCard.id > 0)  // Card has valid ID for selection
+      #expect(addedCard.typeId > 0)  // Card has valid ID for selection
     }
   }
 
@@ -385,27 +336,18 @@ struct CardTests {
 
       // Create three cards with different creation times
       // Add cards with slight time differences
-      let addedCard1 = cardManager.addCard(
-        cardType: .search,
-        name: "First Card"
-      )
+      let addedCard1 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)  // Small delay to ensure different timestamps
 
-      let addedCard2 = cardManager.addCard(
-        cardType: .search,
-        name: "Second Card"
-      )
+      let addedCard2 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
 
-      let addedCard3 = cardManager.addCard(
-        cardType: .search,
-        name: "Third Card"
-      )
+      let addedCard3 = cardManager.addCard( cardType: .search)
 
       // Verify cards were added with correct IDs
-      #expect(addedCard1.id == 1)
-      #expect(addedCard2.id == 2)
-      #expect(addedCard3.id == 3)
+      #expect(addedCard1.typeId == 1)
+      #expect(addedCard2.typeId == 2)
+      #expect(addedCard3.typeId == 3)
 
       // Simulate selecting the middle card (card2)
       let selectedCard = addedCard2
@@ -417,8 +359,7 @@ struct CardTests {
       // The next card should be card3 (created after card2)
       let nextCard = sortedCards.first { $0.createdAt > selectedCard.createdAt }
       #expect(nextCard != nil)
-      #expect(nextCard?.id == 3)
-      #expect(nextCard?.name == "Third Card")
+      #expect(nextCard?.typeId == 3)
     }
   }
 
@@ -428,18 +369,11 @@ struct CardTests {
       let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create two cards
-      let addedCard1 = cardManager.addCard(
-        cardType: .search,
-        name: "First Card"
-      )
+      let addedCard1 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedCard2 = cardManager.addCard(
-        cardType: .search,
-        name: "Second Card"
-      )
+      let addedCard2 = cardManager.addCard( cardType: .search)
 
       // Simulate selecting the last card (card2)
-      let selectedCard = addedCard2
 
       // Simulate finding the next card after deleting card2
       let remainingCards = [addedCard1]
@@ -448,25 +382,7 @@ struct CardTests {
       // Since no card was created after card2, should select the last remaining card
       let nextCard = sortedCards.last
       #expect(nextCard != nil)
-      #expect(nextCard?.id == 1)
-      #expect(nextCard?.name == "First Card")
-    }
-  }
-
-  @Test func testNoCardSelectedWhenOnlyCardDeleted() async throws {
-    await MainActor.run {
-      let container = try! createInMemoryContainer()
-      let cardManager = CardManager(modelContext: container.mainContext)
-
-      // Create only one card
-      let addedCard1 = cardManager.addCard(cardType: .search, name: "Only Card")
-
-      // Simulate deleting the only card
-      let remainingCards: [Card] = []
-
-      // Should return nil when no cards remain
-      #expect(remainingCards.isEmpty)
-      // No next card should be available
+      #expect(nextCard?.typeId == 1)
     }
   }
 
@@ -476,36 +392,17 @@ struct CardTests {
       let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create cards in a specific order
-      let addedCard1 = cardManager.addCard(cardType: .search, name: "Card 1")
+      let addedCard1 = cardManager.addCard(cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedCard2 = cardManager.addCard(cardType: .search, name: "Card 2")
+      let addedCard2 = cardManager.addCard(cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedCard3 = cardManager.addCard(cardType: .search, name: "Card 3")
+      let addedCard3 = cardManager.addCard(cardType: .search)
 
+      let allCards =  cardManager.allCards;
       // Verify creation order
-      #expect(addedCard1.createdAt < addedCard2.createdAt)
-      #expect(addedCard2.createdAt < addedCard3.createdAt)
-
-      // Test selection logic for each card
-      let allCards = [addedCard1, addedCard2, addedCard3]
-
-      // When deleting card1, next should be card2
-      let nextAfterCard1 = allCards.first {
-        $0.createdAt > addedCard1.createdAt
-      }
-      #expect(nextAfterCard1?.id == 2)
-
-      // When deleting card2, next should be card3
-      let nextAfterCard2 = allCards.first {
-        $0.createdAt > addedCard2.createdAt
-      }
-      #expect(nextAfterCard2?.id == 3)
-
-      // When deleting card3, should fall back to last remaining card
-      let remainingAfterCard3 = [addedCard1, addedCard2]
-      let lastCard = remainingAfterCard3.sorted { $0.createdAt < $1.createdAt }
-        .last
-      #expect(lastCard?.id == 2)
+      #expect(allCards[0] == addedCard1)
+      #expect(allCards[1] == addedCard2)
+      #expect(allCards[2] == addedCard3)
     }
   }
 
@@ -517,15 +414,9 @@ struct CardTests {
       let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create test cards
-      let addedCard1 = cardManager.addCard(
-        cardType: .search,
-        name: "First Card"
-      )
+      let addedCard1 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedCard2 = cardManager.addCard(
-        cardType: .search,
-        name: "Second Card"
-      )
+      let addedCard2 = cardManager.addCard( cardType: .search)
 
       // Simulate the selection behavior from ContentView
       var selectedCard: Card? = nil
@@ -533,20 +424,20 @@ struct CardTests {
 
       // Test selecting first card
       selectedCard = addedCard1
-      selectedCards = [addedCard1.id]
+      selectedCards = [addedCard1.typeId]
 
-      #expect(selectedCard?.id == addedCard1.id)
-      #expect(selectedCards.contains(addedCard1.id))
+      #expect(selectedCard?.typeId == addedCard1.typeId)
+      #expect(selectedCards.contains(addedCard1.typeId))
       #expect(selectedCards.count == 1)
 
       // Test selecting second card
       selectedCard = addedCard2
-      selectedCards = [addedCard2.id]
+      selectedCards = [addedCard2.typeId]
 
-      #expect(selectedCard?.id == addedCard2.id)
-      #expect(selectedCards.contains(addedCard2.id))
+      #expect(selectedCard?.typeId == addedCard2.typeId)
+      #expect(selectedCards.contains(addedCard2.typeId))
       #expect(selectedCards.count == 1)
-      #expect(!selectedCards.contains(addedCard1.id))  // Previous card should be deselected
+      #expect(!selectedCards.contains(addedCard1.typeId))  // Previous card should be deselected
 
       // Test deselecting all cards
       selectedCard = nil
@@ -563,47 +454,37 @@ struct CardTests {
       let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create test cards
-      let addedCard1 = cardManager.addCard(
-        cardType: .search,
-        name: "Test Card 1"
-      )
+      let addedCard1 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedCard2 = cardManager.addCard(
-        cardType: .search,
-        name: "Test Card 2"
-      )
+      let addedCard2 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedCard3 = cardManager.addCard(
-        cardType: .search,
-        name: "Test Card 3"
-      )
-
+      let addedCard3 = cardManager.addCard( cardType: .search)
       // Simulate ContentView selection behavior
       var selectedCard: Card? = nil
       var selectedCards: Set<Int> = []
 
       // Test that selecting a card updates both selectedCard and selectedCards
       selectedCard = addedCard2
-      selectedCards = [addedCard2.id]
+      selectedCards = [addedCard2.typeId]
 
       // Verify consistency between selectedCard and selectedCards
-      #expect(selectedCard?.id == addedCard2.id)
-      #expect(selectedCards.contains(addedCard2.id))
+      #expect(selectedCard?.typeId == addedCard2.typeId)
+      #expect(selectedCards.contains(addedCard2.typeId))
       #expect(selectedCards.count == 1)
 
       // Test that the selected card ID matches the selectedCards set
-      if let selectedCardId = selectedCard?.id {
+      if let selectedCardId = selectedCard?.typeId {
         #expect(selectedCards.contains(selectedCardId))
         #expect(selectedCards.first == selectedCardId)
       }
 
       // Test switching selection
       selectedCard = addedCard3
-      selectedCards = [addedCard3.id]
+      selectedCards = [addedCard3.typeId]
 
-      #expect(selectedCard?.id == addedCard3.id)
-      #expect(selectedCards.contains(addedCard3.id))
-      #expect(!selectedCards.contains(addedCard2.id))  // Previous selection should be cleared
+      #expect(selectedCard?.typeId == addedCard3.typeId)
+      #expect(selectedCards.contains(addedCard3.typeId))
+      #expect(!selectedCards.contains(addedCard2.typeId))  // Previous selection should be cleared
       #expect(selectedCards.count == 1)
     }
   }
@@ -614,15 +495,9 @@ struct CardTests {
       let cardManager = CardManager(modelContext: container.mainContext)
 
       // Create test cards
-      let addedCard1 = cardManager.addCard(
-        cardType: .search,
-        name: "Focus Card 1"
-      )
+      let addedCard1 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
-      let addedCard2 = cardManager.addCard(
-        cardType: .search,
-        name: "Focus Card 2"
-      )
+      let addedCard2 = cardManager.addCard( cardType: .search)
 
       // Simulate focus state tracking
       var focusedCardId: Int? = nil
@@ -634,22 +509,22 @@ struct CardTests {
 
       // Test selecting first card triggers focus change
       selectedCard = addedCard1
-      focusedCardId = selectedCard?.id
+      focusedCardId = selectedCard?.typeId
 
-      #expect(focusedCardId == addedCard1.id)
-      #expect(selectedCard?.id == addedCard1.id)
+      #expect(focusedCardId == addedCard1.typeId)
+      #expect(selectedCard?.typeId == addedCard1.typeId)
 
       // Test selecting second card changes focus
       selectedCard = addedCard2
-      focusedCardId = selectedCard?.id
+      focusedCardId = selectedCard?.typeId
 
-      #expect(focusedCardId == addedCard2.id)
-      #expect(selectedCard?.id == addedCard2.id)
-      #expect(focusedCardId != addedCard1.id)  // Focus should have changed
+      #expect(focusedCardId == addedCard2.typeId)
+      #expect(selectedCard?.typeId == addedCard2.typeId)
+      #expect(focusedCardId != addedCard1.typeId)  // Focus should have changed
 
       // Test deselecting removes focus
       selectedCard = nil
-      focusedCardId = selectedCard?.id
+      focusedCardId = selectedCard?.typeId
 
       #expect(focusedCardId == nil)
       #expect(selectedCard == nil)

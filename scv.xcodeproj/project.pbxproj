@@ -630,6 +630,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+/* End XCConfigurationList section */
 	};
 	rootObject = F20366A62EA8F25E00E2C0FC /* Project object */;
 }

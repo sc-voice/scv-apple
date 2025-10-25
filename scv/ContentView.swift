@@ -109,14 +109,16 @@ struct ContentView: View {
       return card.name
     } else {
       let localizedType = card.localizedCardTypeName()
-      return "\(localizedType) \(card.id)"
+      return "\(localizedType) \(card.typeId)"
     }
   }
 
   /// Save the selected card ID to UserDefaults
-  private func saveSelectedCard(_ cardId: Int?) {
+  private func saveSelectedCard(_ cardId: PersistentIdentifier?) {
     if let cardId = cardId {
-      UserDefaults.standard.set(cardId, forKey: selectedCardKey)
+      if let data = try? JSONEncoder().encode(cardId) {
+        UserDefaults.standard.set(data, forKey: selectedCardKey)
+      }
     } else {
       UserDefaults.standard.removeObject(forKey: selectedCardKey)
     }
@@ -124,8 +126,8 @@ struct ContentView: View {
 
   /// Restore the selected card from UserDefaults
   private func restoreSelectedCard() {
-    let savedCardId = UserDefaults.standard.integer(forKey: selectedCardKey)
-    guard savedCardId != 0 else { return }
+    guard let data = UserDefaults.standard.data(forKey: selectedCardKey),
+          let savedCardId = try? JSONDecoder().decode(PersistentIdentifier.self, from: data) else { return }
 
     // Find the card with the saved ID
     if let card = allCards.first(where: { $0.id == savedCardId }) {
@@ -139,7 +141,7 @@ struct ContentView: View {
     withAnimation {
       // Determine card type: alternating between search and sutta
       let cardType: CardType = allCards.count % 2 == 0 ? .search : .sutta
-      let cardWithId = cardManager?.addCard(cardType: cardType, name: "")
+      let cardWithId = cardManager?.addCard(cardType: cardType)
 
       // Select the newly created card after it's saved
       if let cardWithId = cardWithId {

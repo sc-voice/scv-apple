@@ -77,7 +77,24 @@ struct ContentView: View {
       }
     } detail: {
       if let selectedCard = selectedCard {
-        Text(cardTitle(for: selectedCard))
+        switch selectedCard.cardType {
+        case .search:
+          SearchView(card: Binding(
+            get: { selectedCard },
+            set: { newValue in
+              // Update the selected card
+              self.selectedCard = newValue
+            }
+          ))
+        case .sutta:
+          SuttaView(card: Binding(
+            get: { selectedCard },
+            set: { newValue in
+              // Update the selected card
+              self.selectedCard = newValue
+            }
+          ))
+        }
       } else {
         Text("select.card".localized)
       }

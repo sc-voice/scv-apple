@@ -27,17 +27,30 @@ final class Card {
     return "\(localizedCardTypeName()) \(typeId)"
   }
   private(set) var typeId: Int
+  
+  // Search card properties
+  var searchQuery: String = ""
+  var searchResults: Data?
+  
+  // Sutta card properties
+  var suttaReference: String = ""
 
   // MARK: - Initialization
 
   init(
     createdAt: Date = Date(),
     cardType: CardType = .search,
-    typeId: Int = 0
+    typeId: Int = 0,
+    searchQuery: String = "",
+    searchResults: Data? = nil,
+    suttaReference: String = ""
   ) {
     self.createdAt = createdAt
     self.cardType = cardType
     self.typeId = typeId
+    self.searchQuery = searchQuery
+    self.searchResults = searchResults
+    self.suttaReference = suttaReference
   }
 
   // MARK: - Public Methods

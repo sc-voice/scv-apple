@@ -15,5 +15,27 @@
 "card.type.search" = "Recherche";
 "card.type.sutta" = "Sutta";
 
+// Search view strings
+"search.placeholder" = "Entrez une requête de recherche...";
+"search.button" = "Rechercher";
+"search.placeholder.title" = "Rechercher dans les Suttas";
+"search.placeholder.message" = "Entrez une requête de recherche pour trouver des passages pertinents dans le canon bouddhiste.";
+"search.empty.title" = "Aucun Résultat";
+"search.empty.message" = "Aucune correspondance trouvée. Essayez un autre terme de recherche.";
+"search.error.title" = "Erreur de Recherche";
+"search.retry" = "Réessayer";
+"search.results.summary" = "Résultats de Recherche";
+
+// Sutta view strings
+"sutta.reference.placeholder" = "Entrez une référence de sutta (ex. mn1, sn1.1)";
+"sutta.load.button" = "Charger le Sutta";
+"sutta.placeholder.title" = "Lire un Sutta";
+"sutta.placeholder.message" = "Entrez une référence de sutta pour lire le texte complet.";
+"sutta.examples.title" = "Exemples :";
+"sutta.empty.title" = "Sutta Non Trouvé";
+"sutta.empty.message" = "Aucun sutta trouvé avec cette référence. Veuillez vérifier et réessayer.";
+"sutta.error.title" = "Erreur de Chargement";
+"sutta.retry" = "Réessayer";
+
 // Error messages
 "model.container.error" = "Impossible de créer ModelContainer : %@";

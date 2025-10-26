@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - Main Search Response
-struct SearchResponse: Codable {
+public struct SearchResponse: Codable {
   let author: String
   let lang: String
   let searchLang: String
@@ -22,10 +22,23 @@ struct SearchResponse: Codable {
   let bilaraPaths: [String]
   let suttaRefs: [String]
   let mlDocs: [MLDocument]
+  
+  // Error handling fields
+  let searchError: SearchErrorInfo?
+  let searchSuggestion: String?
+  
+  // Computed properties
+  var isSuccess: Bool { searchError == nil }
+}
+
+// MARK: - Search Error Info
+public struct SearchErrorInfo: Codable {
+  let code: String
+  let message: String
 }
 
 // MARK: - ML Document
-struct MLDocument: Codable {
+public struct MLDocument: Codable {
   let author: String
   let segMap: [String: Segment]
   let suttaCode: String
@@ -34,7 +47,7 @@ struct MLDocument: Codable {
 }
 
 // MARK: - Segment
-struct Segment: Codable {
+public struct Segment: Codable {
   let scid: String
   let pli: String?
   let ref: String?
@@ -51,7 +64,7 @@ struct Segment: Codable {
 }
 
 // MARK: - Document Stats
-struct DocumentStats: Codable {
+public struct DocumentStats: Codable {
   let text: Int
   let lang: String
   let nSegments: Int
@@ -86,6 +99,38 @@ extension SearchResponse {
   /// Returns all unique sutta references
   var uniqueSuttaRefs: [String] {
     return Array(Set(suttaRefs))
+  }
+  
+  /// Creates a failure SearchResponse with error information
+  /// - Parameters:
+  ///   - code: Error code (e.g., "file_not_found", "network_error")
+  ///   - message: Human-readable error message
+  ///   - suggestion: Optional remediation advice
+  ///   - pattern: The search pattern that was attempted
+  /// - Returns: A SearchResponse representing a failed search
+  static func failure(
+    code: String,
+    message: String,
+    suggestion: String? = nil,
+    pattern: String
+  ) -> SearchResponse {
+    return SearchResponse(
+      author: "",
+      lang: "",
+      searchLang: "",
+      minLang: 0,
+      maxDoc: 0,
+      maxResults: 0,
+      pattern: pattern,
+      method: "",
+      resultPattern: "",
+      segsMatched: 0,
+      bilaraPaths: [],
+      suttaRefs: [],
+      mlDocs: [],
+      searchError: SearchErrorInfo(code: code, message: message),
+      searchSuggestion: suggestion
+    )
   }
 }
 

@@ -16,7 +16,9 @@
 "card.type.sutta" = "Сутта";
 
 // Search view strings
-"search.placeholder" = "Введите поисковый запрос...";
+"search.field.placeholder" = "Введите поисковый запрос...";
+"search.field.accessibility.label" = "Поле поиска";
+"search.button.accessibility.label" = "Поиск сейчас";
 "search.button" = "Поиск";
 "search.placeholder.title" = "Поиск в суттах";
 "search.placeholder.message" = "Введите поисковый запрос, чтобы найти соответствующие отрывки в буддийском каноне.";

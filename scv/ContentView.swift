@@ -71,6 +71,13 @@ struct ContentView: View {
         return .ignored
       }
       .toolbar {
+        #if os(iOS)
+        ToolbarItem(placement: .principal) {
+          Text("SC-Voice")
+            .font(.system(size: 16, weight: .semibold, design: .default))
+            .foregroundColor(.white)
+        }
+        #endif
         ToolbarItem {
           Button(action: addCard) {
             Label("add.card".localized, systemImage: "plus")
@@ -78,6 +85,9 @@ struct ContentView: View {
           .accessibilityIdentifier("addCardButton")
         }
       }
+      .toolbarBackground(Color(red: 0.239, green: 0.204, blue: 0.188), for: .automatic)
+      .toolbarBackground(.visible, for: .automatic)
+      .foregroundColor(.white)
     } detail: {
       if let selectedCard = selectedCard {
         switch selectedCard.cardType {

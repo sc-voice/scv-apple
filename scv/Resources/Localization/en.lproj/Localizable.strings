@@ -16,7 +16,9 @@
 "card.type.sutta" = "Sutta";
 
 // Search view strings
-"search.placeholder" = "Enter search query...";
+"search.field.placeholder" = "Enter search query...";
+"search.field.accessibility.label" = "Search Field";
+"search.button.accessibility.label" = "Search Now";
 "search.button" = "Search";
 "search.placeholder.title" = "Search the Suttas";
 "search.placeholder.message" = "Enter a search query to find relevant passages in the Buddhist canon.";

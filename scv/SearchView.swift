@@ -43,17 +43,19 @@ struct SearchView: View {
   
   private var searchBar: some View {
     HStack {
-      TextField("search.placeholder".localized, text: $card.searchQuery)
+      TextField("search.field.placeholder".localized, text: $card.searchQuery)
         .textFieldStyle(.roundedBorder)
         .onSubmit {
           performSearch()
         }
-        .accessibilityIdentifier("searchTextField")
-      
+        .accessibilityLabel("search.field.accessibility.label".localized)
+        .accessibilityIdentifier("searchField")
+
       Button(action: performSearch) {
-        Label("search.button".localized, systemImage: "magnifyingglass")
+        Image(systemName: "magnifyingglass")
       }
       .disabled(card.searchQuery.isEmpty || isSearching)
+      .accessibilityLabel("search.button.accessibility.label".localized)
       .accessibilityIdentifier("searchButton")
     }
     .padding()

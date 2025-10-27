@@ -323,7 +323,8 @@ struct CardTests {
     // Test that it's appropriate for accessibility (descriptive)
     #expect(
       localizedText.contains("Close") || localizedText.contains("Cerrar")
-        || localizedText.contains("Fermer")
+        || localizedText.contains("Fermer") || localizedText.contains("schließen")
+        || localizedText.contains("Закрыть")
     )
   }
 

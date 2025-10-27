@@ -1,0 +1,41 @@
+/*
+  Localizable.strings
+  SC-Voice
+
+  Created by Visakha on 22/10/2025.
+*/
+
+// Card-related strings
+"card.at.createdAt" = "Карточка в %@";
+"add.card" = "Добавить карточку";
+"select.card" = "Выберите карточку";
+"close.card" = "Закрыть карточку";
+
+// Card type strings
+"card.type.search" = "Поиск";
+"card.type.sutta" = "Сутта";
+
+// Search view strings
+"search.placeholder" = "Введите поисковый запрос...";
+"search.button" = "Поиск";
+"search.placeholder.title" = "Поиск в суттах";
+"search.placeholder.message" = "Введите поисковый запрос, чтобы найти соответствующие отрывки в буддийском каноне.";
+"search.empty.title" = "Нет результатов";
+"search.empty.message" = "Совпадений не найдено. Попробуйте другой поисковый запрос.";
+"search.error.title" = "Ошибка поиска";
+"search.retry" = "Повторить";
+"search.results.summary" = "Результаты поиска";
+
+// Sutta view strings
+"sutta.reference.placeholder" = "Введите ссылку на сутту (например, mn1, sn1.1)";
+"sutta.load.button" = "Загрузить сутту";
+"sutta.placeholder.title" = "Прочитать сутту";
+"sutta.placeholder.message" = "Введите ссылку на сутту, чтобы прочитать полный текст.";
+"sutta.examples.title" = "Примеры:";
+"sutta.empty.title" = "Сутта не найдена";
+"sutta.empty.message" = "Сутта с такой ссылкой не найдена. Пожалуйста, проверьте и попробуйте снова.";
+"sutta.error.title" = "Ошибка загрузки";
+"sutta.retry" = "Повторить";
+
+// Error messages
+"model.container.error" = "Не удалось создать ModelContainer: %@";

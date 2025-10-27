@@ -1,0 +1,41 @@
+/*
+  Localizable.strings
+  SC-Voice
+
+  Created by Visakha on 22/10/2025.
+*/
+
+// Card-related strings
+"card.at.createdAt" = "Cartão em %@";
+"add.card" = "Adicionar Cartão";
+"select.card" = "Selecione um cartão";
+"close.card" = "Fechar Cartão";
+
+// Card type strings
+"card.type.search" = "Pesquisa";
+"card.type.sutta" = "Sutta";
+
+// Search view strings
+"search.placeholder" = "Introduza a consulta de pesquisa...";
+"search.button" = "Pesquisar";
+"search.placeholder.title" = "Pesquisar nos Suttas";
+"search.placeholder.message" = "Introduza uma consulta de pesquisa para encontrar passagens relevantes no cânone budista.";
+"search.empty.title" = "Sem Resultados";
+"search.empty.message" = "Nenhuma correspondência encontrada. Tente um termo de pesquisa diferente.";
+"search.error.title" = "Erro de Pesquisa";
+"search.retry" = "Tentar Novamente";
+"search.results.summary" = "Resultados da Pesquisa";
+
+// Sutta view strings
+"sutta.reference.placeholder" = "Introduza a referência do sutta (por exemplo, mn1, sn1.1)";
+"sutta.load.button" = "Carregar Sutta";
+"sutta.placeholder.title" = "Ler um Sutta";
+"sutta.placeholder.message" = "Introduza uma referência do sutta para ler o texto completo.";
+"sutta.examples.title" = "Exemplos:";
+"sutta.empty.title" = "Sutta Não Encontrado";
+"sutta.empty.message" = "Nenhum sutta encontrado com essa referência. Por favor, verifique e tente novamente.";
+"sutta.error.title" = "Erro ao Carregar";
+"sutta.retry" = "Tentar Novamente";
+
+// Error messages
+"model.container.error" = "Não foi possível criar ModelContainer: %@";

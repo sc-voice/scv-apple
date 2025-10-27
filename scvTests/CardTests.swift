@@ -324,7 +324,7 @@ struct CardTests {
     #expect(
       localizedText.contains("Close") || localizedText.contains("Cerrar")
         || localizedText.contains("Fermer") || localizedText.contains("schließen")
-        || localizedText.contains("Закрыть")
+        || localizedText.contains("Закрыть") || localizedText.contains("Fechar")
     )
   }
 

@@ -305,6 +305,27 @@ struct SearchResponseTests {
     #expect(response.suttaRefs.count == 1)
   }
 
+  @Test func testSearchResponseEmptyConstructor() async throws {
+    let response = SearchResponse()
+
+    #expect(response.author == "")
+    #expect(response.lang == "")
+    #expect(response.searchLang == "")
+    #expect(response.minLang == 0)
+    #expect(response.maxDoc == 0)
+    #expect(response.maxResults == 0)
+    #expect(response.pattern == "")
+    #expect(response.method == "")
+    #expect(response.resultPattern == "")
+    #expect(response.segsMatched == 0)
+    #expect(response.bilaraPaths == [])
+    #expect(response.suttaRefs == [])
+    #expect(response.mlDocs == [])
+    #expect(response.searchError == nil)
+    #expect(response.searchSuggestion == nil)
+    #expect(response.isSuccess == true)
+  }
+
   @Test func testSearchResponseMatchedSegments() async throws {
     let segMap1 = [
       "seg1": Segment(
@@ -498,5 +519,69 @@ struct SearchResponseTests {
     #expect(decodedResponse.mlDocs.count == originalResponse.mlDocs.count)
     #expect(decodedResponse.bilaraPaths == originalResponse.bilaraPaths)
     #expect(decodedResponse.suttaRefs == originalResponse.suttaRefs)
+  }
+
+  @Test func testSearchResponseSerialization() async throws {
+    // Create a test SearchResponse
+    let stats = DocumentStats(
+      text: 1000,
+      lang: "en",
+      nSegments: 1,
+      nEmptySegments: 0,
+      nSections: 1,
+      seconds: 1.0
+    )
+    let mlDoc = MLDocument(
+      author: "Test Author",
+      segMap: [:],
+      suttaCode: "mn1",
+      blurb: "Test blurb",
+      stats: stats
+    )
+    let originalResponse = SearchResponse(
+      author: "SC-Voice",
+      lang: "en",
+      searchLang: "en",
+      minLang: 1,
+      maxDoc: 10,
+      maxResults: 100,
+      pattern: "test pattern",
+      method: "regex",
+      resultPattern: "test",
+      segsMatched: 5,
+      bilaraPaths: ["path1", "path2"],
+      suttaRefs: ["mn1"],
+      mlDocs: [mlDoc]
+    )
+
+    // Test toJSON()
+    let jsonString = originalResponse.toJSON()
+    #expect(jsonString != nil, "toJSON() should successfully encode SearchResponse")
+
+    guard let jsonString = jsonString else {
+      return
+    }
+
+    // Verify the JSON is valid by checking it contains expected fields
+    #expect(jsonString.contains("\"author\":\"SC-Voice\""))
+    #expect(jsonString.contains("\"pattern\":\"test pattern\""))
+
+    // Test fromJSON()
+    let decodedResponse = SearchResponse.fromJSON(jsonString)
+    #expect(decodedResponse != nil, "fromJSON() should successfully decode JSON")
+
+    guard let decoded = decodedResponse else {
+      return
+    }
+
+    // Verify round-trip properties are preserved
+    #expect(decoded.author == originalResponse.author)
+    #expect(decoded.lang == originalResponse.lang)
+    #expect(decoded.pattern == originalResponse.pattern)
+    #expect(decoded.method == originalResponse.method)
+    #expect(decoded.segsMatched == originalResponse.segsMatched)
+    #expect(decoded.bilaraPaths == originalResponse.bilaraPaths)
+    #expect(decoded.suttaRefs == originalResponse.suttaRefs)
+    #expect(decoded.mlDocs.count == originalResponse.mlDocs.count)
   }
 }

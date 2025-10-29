@@ -99,6 +99,18 @@ Use the `.localized` extension method on String (defined in LocalizationHelper.s
 
 5. **Result Caching**: Search results are cached as Data in the Card model to avoid redundant API calls when switching between cards.
 
+## Critical Invariants
+
+1. **At Least One Card Always Exists**: CardManager ensures there is always at least one card in the application. When CardManager is initialized, if no cards exist, it automatically creates an initial search card. This is enforced in the CardManager initializer.
+
+2. **A Card Is Always Selected**: CardManager maintains a `selectedCardId` property that is never nil. When CardManager is initialized, if no card is selected, it automatically selects the first card. When a card is deleted, CardManager automatically selects the next appropriate card (first card created after the deleted card, or the last card if none were created after). This ensures there is always a valid selection.
+
+3. **Selection is Always Persisted**: The currently selected card ID is always saved to UserDefaults and restored on app launch. This ensures the user returns to their last viewed card.
+
+## macOS-Specific Behavior
+
+1. **Sidebar Minimum Width**: On macOS, the sidebar in ContentView has a minimum width of 180 points (ideal: 200) to ensure the "Add Card" button is always visible and not cut off during window resizing.
+
 ## Testing
 
 The project uses Swift Testing framework (not XCTest):
@@ -165,3 +177,4 @@ Use simple old_string → new_string format for clarity, one diff per file.
 - Focus on being useful, not polite.
 - When uncertain about facts or making inferences, use "I think..." rather than stating assertions as definite facts.
 - Never make assertions without being sure—it's better to acknowledge uncertainty explicitly.
+- **Always show line numbers whenever displaying code snippets.** Use the format `line_number→ code_content` to make it easy to reference specific lines.

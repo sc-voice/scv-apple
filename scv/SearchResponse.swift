@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - Main Search Response
-public struct SearchResponse: Codable {
+public struct SearchResponse: Codable, Equatable {
   let author: String
   let lang: String
   let searchLang: String
@@ -22,23 +22,99 @@ public struct SearchResponse: Codable {
   let bilaraPaths: [String]
   let suttaRefs: [String]
   let mlDocs: [MLDocument]
-  
+
   // Error handling fields
   let searchError: SearchErrorInfo?
   let searchSuggestion: String?
-  
+
   // Computed properties
   var isSuccess: Bool { searchError == nil }
+
+  // Custom initializer with defaults
+  init(
+    author: String = "",
+    lang: String = "",
+    searchLang: String = "",
+    minLang: Int = 0,
+    maxDoc: Int = 0,
+    maxResults: Int = 0,
+    pattern: String = "",
+    method: String = "",
+    resultPattern: String = "",
+    segsMatched: Int = 0,
+    bilaraPaths: [String] = [],
+    suttaRefs: [String] = [],
+    mlDocs: [MLDocument] = [],
+    searchError: SearchErrorInfo? = nil,
+    searchSuggestion: String? = nil
+  ) {
+    self.author = author
+    self.lang = lang
+    self.searchLang = searchLang
+    self.minLang = minLang
+    self.maxDoc = maxDoc
+    self.maxResults = maxResults
+    self.pattern = pattern
+    self.method = method
+    self.resultPattern = resultPattern
+    self.segsMatched = segsMatched
+    self.bilaraPaths = bilaraPaths
+    self.suttaRefs = suttaRefs
+    self.mlDocs = mlDocs
+    self.searchError = searchError
+    self.searchSuggestion = searchSuggestion
+  }
+
+  // MARK: - Equatable
+
+  public static func == (lhs: SearchResponse, rhs: SearchResponse) -> Bool {
+    do {
+      let lhsData = try JSONEncoder().encode(lhs)
+      let rhsData = try JSONEncoder().encode(rhs)
+      let lhsString = String(data: lhsData, encoding: .utf8) ?? ""
+      let rhsString = String(data: rhsData, encoding: .utf8) ?? ""
+      return lhsString == rhsString
+    } catch {
+      return false
+    }
+  }
+
+  // MARK: - JSON Serialization
+
+  /// Creates a SearchResponse from a JSON string
+  /// - Parameter jsonString: A JSON string representation of SearchResponse
+  /// - Returns: A decoded SearchResponse, or nil if decoding fails
+  public static func fromJSON(_ jsonString: String) -> SearchResponse? {
+    guard let data = jsonString.data(using: .utf8) else {
+      return nil
+    }
+    do {
+      return try JSONDecoder().decode(SearchResponse.self, from: data)
+    } catch {
+      return nil
+    }
+  }
+
+  /// Converts SearchResponse to a JSON string
+  /// - Returns: A JSON string representation of SearchResponse, or nil if encoding fails
+  public func toJSON() -> String? {
+    do {
+      let data = try JSONEncoder().encode(self)
+      return String(data: data, encoding: .utf8)
+    } catch {
+      return nil
+    }
+  }
 }
 
 // MARK: - Search Error Info
-public struct SearchErrorInfo: Codable {
+public struct SearchErrorInfo: Codable, Equatable {
   let code: String
   let message: String
 }
 
 // MARK: - ML Document
-public struct MLDocument: Codable {
+public struct MLDocument: Codable, Equatable {
   let author: String
   let segMap: [String: Segment]
   let suttaCode: String
@@ -47,13 +123,13 @@ public struct MLDocument: Codable {
 }
 
 // MARK: - Segment
-public struct Segment: Codable {
+public struct Segment: Codable, Equatable {
   let scid: String
   let pli: String?
   let ref: String?
   let en: String?
   let matched: Bool?
-  
+
   enum CodingKeys: String, CodingKey {
     case scid
     case pli
@@ -64,7 +140,7 @@ public struct Segment: Codable {
 }
 
 // MARK: - Document Stats
-public struct DocumentStats: Codable {
+public struct DocumentStats: Codable, Equatable {
   let text: Int
   let lang: String
   let nSegments: Int

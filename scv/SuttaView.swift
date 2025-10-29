@@ -52,12 +52,14 @@ struct SuttaView: View {
           loadSutta()
         }
         .accessibilityIdentifier("suttaTextField")
-      
+        .accessibilityLabel("sutta.reference.accessibility.label".localized)
+
       Button(action: loadSutta) {
         Label("sutta.load.button".localized, systemImage: "book")
       }
       .disabled(card.suttaReference.isEmpty || isLoading)
       .accessibilityIdentifier("loadSuttaButton")
+      .accessibilityLabel("sutta.load.button.accessibility.label".localized)
     }
     .padding()
   }

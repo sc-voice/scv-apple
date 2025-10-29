@@ -30,7 +30,9 @@
 
 // Sutta view strings
 "sutta.reference.placeholder" = "Enter sutta reference (e.g., mn1, sn1.1)";
+"sutta.reference.accessibility.label" = "Sutta Reference";
 "sutta.load.button" = "Load Sutta";
+"sutta.load.button.accessibility.label" = "Load Sutta";
 "sutta.placeholder.title" = "Read a Sutta";
 "sutta.placeholder.message" = "Enter a sutta reference to read the full text.";
 "sutta.examples.title" = "Examples:";

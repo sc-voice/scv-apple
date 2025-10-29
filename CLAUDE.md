@@ -113,3 +113,55 @@ Current API endpoint: `https://sc-voice.github.io/api/scv/search/{query}`
 - Used for both search queries and sutta lookups
 - Returns SearchResponse JSON with matched segments
 - TODO: The SuttaView should use a dedicated sutta API endpoint instead of the search endpoint
+
+## Planning Discipline
+
+When planning a feature or change:
+1. Create a detailed plan and present it for approval
+2. Wait for explicit "plan approved" confirmation before implementing
+3. **NEVER autonomously diverge from an approved plan**, even if:
+   - You think of a better approach
+   - The next step seems obvious
+   - You want to "just try it quickly"
+4. If you discover issues during implementation that require plan changes, **STOP and ask before proceeding**. Present the blocker and propose a solution. This dialogue teaches both parties and strengthens the partnership.
+5. Always ask for confirmation before building/testing, even if it seems like the natural next step
+
+**Deviation = Planning Failure.** Autonomous deviations break the planning contract and waste the user's time reviewing unexpected changes. Always defer to the user for approval.
+
+**Exception: Technical Blockers During Implementation.** When implementation reveals a technical blocker (e.g., clipping issues, API limitations), ask the user before fixing it. This conversation reveals insights and makes the team smarter together.
+
+### Concrete Behavior Requirements
+
+When you discover an API doesn't exist or a planned approach is wrong:
+1. Stop immediately—do not make changes
+2. Output: "I was wrong about X. The actual API/approach is Y. Should I proceed?"
+3. Wait for explicit user response before proceeding
+
+When you're about to use a different approach than planned:
+1. State the change explicitly
+2. Explain why (blocker or discovery)
+3. Ask for approval before implementing
+4. Do not execute tool calls without approval
+
+If you catch yourself about to diverge without asking:
+1. Do not execute the tool call
+2. Ask first instead
+
+## Edit Workflow
+
+When making multiple file edits:
+1. Show the complete list of affected files upfront
+2. For each file, show the exact diffs (old → new) without asking for confirmation on each delta
+3. Execute all edits in parallel in a single message
+4. Only ask for confirmation if there are ambiguities or potential issues
+
+Use simple old_string → new_string format for clarity, one diff per file.
+
+## Communication Style
+
+- Be direct and terse. Skip pleasantries and affirmations.
+- No "Great question!", "You're absolutely right!", or similar noise.
+- Only acknowledge if the information is relevant or addresses ambiguity.
+- Focus on being useful, not polite.
+- When uncertain about facts or making inferences, use "I think..." rather than stating assertions as definite facts.
+- Never make assertions without being sure—it's better to acknowledge uncertainty explicitly.

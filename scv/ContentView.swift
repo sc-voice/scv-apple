@@ -71,13 +71,6 @@ struct ContentView: View {
         return .ignored
       }
       .toolbar {
-        #if os(iOS)
-        ToolbarItem(placement: .principal) {
-          Text("SC-Voice")
-            .font(.system(size: 16, weight: .semibold, design: .default))
-            .foregroundColor(.white)
-        }
-        #endif
         ToolbarItem {
           Button(action: addCard) {
             Label("add.card".localized, systemImage: "plus")
@@ -168,6 +161,9 @@ struct ContentView: View {
         focusedCardId = cardWithId.id  // Set focus to the new card
       }
     }
+
+    // Post notification to trigger title animation
+    NotificationCenter.default.post(name: NSNotification.Name("onCardContextChange"), object: nil)
   }
 
   private func deleteCards(offsets: IndexSet) {

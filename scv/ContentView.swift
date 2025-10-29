@@ -13,10 +13,13 @@ struct ContentView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(\.locale) private var locale
   @State private var selectedCards: Set<Card.ID> = []
-  @State private var selectedCard: Card?
   @FocusState private var focusedCardId: Card.ID?
 
   private let selectedCardKey = "SelectedCardID"
+
+  private var selectedCard: Card? {
+    cardManager?.selectedCard
+  }
   
   private var allCards: [Card] {
     cardManager?.allCards ?? []
@@ -24,7 +27,7 @@ struct ContentView: View {
 
   var body: some View {
     NavigationSplitView {
-      List(selection: $selectedCard) {
+      List {
         ForEach(allCards) { card in
           HStack {
             Image(systemName: card.iconName())
@@ -48,8 +51,18 @@ struct ContentView: View {
               .accessibilityLabel("close.card".localized)
             }
           }
-          .tag(card)
+          .contentShape(Rectangle())
+          .onTapGesture {
+            cardManager?.selectCard(card)
+            selectedCards = [card.id]
+            focusedCardId = card.id
+          }
           .focused($focusedCardId, equals: card.id)
+          .background(
+            selectedCard?.id == card.id
+              ? Color.blue.opacity(0.2)
+              : Color.clear
+          )
         }
         #if os(iOS)
           .onDelete(perform: deleteCards)
@@ -73,14 +86,19 @@ struct ContentView: View {
       .toolbar {
         ToolbarItem {
           Button(action: addCard) {
-            Label("add.card".localized, systemImage: "plus")
+            Image(systemName: "plus")
+              .accessibilityHidden(true)
           }
           .accessibilityIdentifier("addCardButton")
+          .accessibilityLabel("add.card".localized)
         }
       }
       .toolbarBackground(Color(red: 0.239, green: 0.204, blue: 0.188), for: .automatic)
       .toolbarBackground(.visible, for: .automatic)
       .foregroundColor(.white)
+      #if os(macOS)
+      .navigationSplitViewColumnWidth(min: 180, ideal: 200)
+      #endif
     } detail: {
       if let selectedCard = selectedCard {
         switch selectedCard.cardType {
@@ -106,10 +124,6 @@ struct ContentView: View {
         selectedCards = [newSelectedCard.id]
         focusedCardId = newSelectedCard.id  // Set focus to the selected card
         saveSelectedCard(newSelectedCard.id)
-      } else {
-        selectedCards = []
-        focusedCardId = nil  // Clear focus when no card is selected
-        saveSelectedCard(nil)
       }
     }
   }
@@ -142,7 +156,7 @@ struct ContentView: View {
 
     // Find the card with the saved ID
     if let card = allCards.first(where: { $0.id == savedCardId }) {
-      selectedCard = card
+      cardManager?.selectCard(card)
       selectedCards = [card.id]
       focusedCardId = card.id  // Restore focus to the saved card
     }
@@ -156,7 +170,7 @@ struct ContentView: View {
 
       // Select the newly created card after it's saved
       if let cardWithId = cardWithId {
-        selectedCard = cardWithId
+        cardManager?.selectCard(cardWithId)
         selectedCards = [cardWithId.id]
         focusedCardId = cardWithId.id  // Set focus to the new card
       }
@@ -177,43 +191,16 @@ struct ContentView: View {
       // Remove from selection
       selectedCards.remove(card.id)
 
-      // Clear selectedCard if it's the one being deleted
-      if selectedCard?.id == card.id {
-        selectedCard = nil
-        focusedCardId = nil
-
-        // Try to select the next available card
-        if let nextCard = findNextCard(after: card) {
-          selectedCard = nextCard
-          selectedCards = [nextCard.id]
-          focusedCardId = nextCard.id  // Set focus to the next card
-        }
-      }
-
       // Delete the card using CardManager
+      // CardManager will handle updating selection if the deleted card was selected
       cardManager?.removeCard(card)
+
+      // Update selectedCards to reflect the new selection from CardManager
+      if let selectedCard = selectedCard {
+        selectedCards = [selectedCard.id]
+        focusedCardId = selectedCard.id
+      }
     }
-  }
-
-  /// Finds the next card to select after deleting a card
-  private func findNextCard(after deletedCard: Card) -> Card? {
-    let remainingCards = allCards.filter { $0.id != deletedCard.id }
-
-    // If no cards remain, return nil
-    guard !remainingCards.isEmpty else { return nil }
-
-    // Sort cards by creation date to maintain order
-    let sortedCards = remainingCards.sorted { $0.createdAt < $1.createdAt }
-
-    // Find the card that was created after the deleted card
-    if let nextIndex = sortedCards.firstIndex(where: {
-      $0.createdAt > deletedCard.createdAt
-    }) {
-      return sortedCards[nextIndex]
-    }
-
-    // If no card was created after the deleted card, select the last card
-    return sortedCards.last
   }
 
   private func deleteCurrentSelectedCard() {
@@ -222,34 +209,14 @@ struct ContentView: View {
     }
 
     withAnimation {
-      // Find the next card to select after deletion
-      let sortedCards = allCards.sorted { $0.createdAt < $1.createdAt }
-      let currentIndex = sortedCards.firstIndex { $0.id == cardToDelete.id }
-
       // Delete the card using CardManager
+      // CardManager will handle updating selection
       cardManager?.removeCard(cardToDelete)
 
-      // Now select the next card from the updated list
-      let updatedCards = allCards.sorted { $0.createdAt < $1.createdAt }
-
-      if let currentIndex = currentIndex, !updatedCards.isEmpty {
-        let nextIndex =
-          currentIndex < updatedCards.count
-          ? currentIndex : max(0, updatedCards.count - 1)
-        if nextIndex >= 0, nextIndex < updatedCards.count {
-          let nextCard = updatedCards[nextIndex]
-          selectedCard = nextCard
-          selectedCards = [nextCard.id]
-          focusedCardId = nextCard.id  // Set focus to the next card
-        } else {
-          selectedCard = nil
-          selectedCards = []
-          focusedCardId = nil  // Clear focus when no cards remain
-        }
-      } else {
-        selectedCard = nil
-        selectedCards = []
-        focusedCardId = nil  // Clear focus when no cards remain
+      // Update selectedCards to reflect the new selection from CardManager
+      if let selectedCard = selectedCard {
+        selectedCards = [selectedCard.id]
+        focusedCardId = selectedCard.id
       }
     }
   }
@@ -266,10 +233,13 @@ struct ContentView: View {
         }
       }
 
-      // Clear selection after deletion
+      // Clear selection after deletion, but CardManager ensures a card is always selected
       selectedCards.removeAll()
-      selectedCard = nil
-      focusedCardId = nil  // Clear focus after deletion
+      // Update selectedCards to reflect the new selection from CardManager
+      if let selectedCard = selectedCard {
+        selectedCards = [selectedCard.id]
+        focusedCardId = selectedCard.id
+      }
     }
   }
 }

@@ -166,26 +166,36 @@ struct CardTests {
 
   // MARK: - CardManager Tests
 
+  @Test func testCardManagerCreatesInitialCard() async throws {
+    await MainActor.run {
+      let container = try! createInMemoryContainer()
+      let cardManager = CardManager(modelContext: container.mainContext)
+
+      #expect(cardManager.allCards.count == 1)
+    }
+  }
+
   @Test func testCardManagerAddCardAssignsCorrectId() async throws {
     await MainActor.run {
       let container = try! createInMemoryContainer()
       let cardManager = CardManager(modelContext: container.mainContext)
 
-      // Add first card - should get ID 1
+      // Initial card is created automatically (ID 1 for search)
+      // Add first new card - should get ID 2
       let addedCard1 = cardManager.addCard(
         cardType: .search,
       )
-      #expect(addedCard1.typeId == 1)
+      #expect(addedCard1.typeId == 2)
       #expect(addedCard1.cardType == CardType.search)
 
-      // Add second card - should get ID 2
+      // Add second new card - should get ID 3
       let addedCard2 = cardManager.addCard(
         cardType: .search,
       )
-      #expect(addedCard2.typeId == 2)
+      #expect(addedCard2.typeId == 3)
       #expect(addedCard2.cardType == CardType.search)
 
-      // Add card of different type - should get ID 1 for that type
+      // Add card of different type - should get ID 1 for that type (first of its type)
       let addedCard3 = cardManager.addCard(cardType: .sutta)
       #expect(addedCard3.typeId == 1)
       #expect(addedCard3.cardType == CardType.sutta)
@@ -197,10 +207,11 @@ struct CardTests {
       let container = try! createInMemoryContainer()
       let cardManager = CardManager(modelContext: container.mainContext)
 
+      // Initial card is created with ID 1, so added card gets ID 2
       let addedCard = cardManager.addCard(cardType: .search)
 
       // The returned card should have the correct ID and properties
-      #expect(addedCard.typeId == 1)  // Correct ID assigned
+      #expect(addedCard.typeId == 2)  // Correct ID assigned (2 because 1 is initial card)
       #expect(addedCard.cardType == .search)
       #expect(addedCard.name.contains("card.type.search".localized))
       #expect(addedCard.createdAt <= Date())  // Should be recent
@@ -212,7 +223,8 @@ struct CardTests {
       let container = try! createInMemoryContainer()
       let cardManager = CardManager(modelContext: container.mainContext)
 
-      // Add all cards
+      // Initial search card is created with ID 1
+      // Add more search cards
       let addedSearchCard1 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
       let addedSearchCard2 = cardManager.addCard( cardType: .search)
@@ -247,10 +259,10 @@ struct CardTests {
         "Sutta card IDs should be unique"
       )
 
-      // Verify IDs are sequential within each type
+      // Verify IDs are sequential (2, 3, 4 for search because initial card has ID 1)
       #expect(
-        searchIds.sorted() == [1, 2, 3],
-        "Search card IDs should be sequential starting from 1"
+        searchIds.sorted() == [2, 3, 4],
+        "Search card IDs should be sequential starting from 2 (after initial card)"
       )
       #expect(
         suttaIds.sorted() == [1, 2, 3],
@@ -259,9 +271,9 @@ struct CardTests {
 
       // Verify that IDs can overlap between types (this is the expected behavior)
       // Both types can have ID 1, 2, 3, etc.
-      #expect(searchIds.contains(1), "Search cards should have ID 1")
-      #expect(suttaIds.contains(1), "Sutta cards should have ID 1")
       #expect(searchIds.contains(2), "Search cards should have ID 2")
+      #expect(suttaIds.contains(1), "Sutta cards should have ID 1")
+      #expect(searchIds.contains(3), "Search cards should have ID 3")
       #expect(suttaIds.contains(2), "Sutta cards should have ID 2")
     }
   }
@@ -273,11 +285,12 @@ struct CardTests {
       let container = try! createInMemoryContainer()
       let cardManager = CardManager(modelContext: container.mainContext)
 
+      // Initial card is created with ID 1
       // Simulate the UI behavior: add a card and verify it should be selected
       let addedCard = cardManager.addCard(cardType: .search)
 
-      // Verify the card was added with correct ID
-      #expect(addedCard.typeId == 1)
+      // Verify the card was added with correct ID (ID 2 because initial card is ID 1)
+      #expect(addedCard.typeId == 2)
       #expect(addedCard.cardType == CardType.search)
 
       // In the UI, this card should be selected after adding
@@ -335,7 +348,8 @@ struct CardTests {
       let container = try! createInMemoryContainer()
       let cardManager = CardManager(modelContext: container.mainContext)
 
-      // Create three cards with different creation times
+      // Initial card is created with ID 1
+      // Create three additional cards with different creation times
       // Add cards with slight time differences
       let addedCard1 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)  // Small delay to ensure different timestamps
@@ -345,10 +359,10 @@ struct CardTests {
 
       let addedCard3 = cardManager.addCard( cardType: .search)
 
-      // Verify cards were added with correct IDs
-      #expect(addedCard1.typeId == 1)
-      #expect(addedCard2.typeId == 2)
-      #expect(addedCard3.typeId == 3)
+      // Verify cards were added with correct IDs (initial card is ID 1)
+      #expect(addedCard1.typeId == 2)
+      #expect(addedCard2.typeId == 3)
+      #expect(addedCard3.typeId == 4)
 
       // Simulate selecting the middle card (card2)
       let selectedCard = addedCard2
@@ -360,7 +374,7 @@ struct CardTests {
       // The next card should be card3 (created after card2)
       let nextCard = sortedCards.first { $0.createdAt > selectedCard.createdAt }
       #expect(nextCard != nil)
-      #expect(nextCard?.typeId == 3)
+      #expect(nextCard?.typeId == 4)  // addedCard3 has ID 4
     }
   }
 
@@ -369,7 +383,8 @@ struct CardTests {
       let container = try! createInMemoryContainer()
       let cardManager = CardManager(modelContext: container.mainContext)
 
-      // Create two cards
+      // Initial card exists with ID 1
+      // Create two additional cards
       let addedCard1 = cardManager.addCard( cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
       let addedCard2 = cardManager.addCard( cardType: .search)
@@ -383,7 +398,7 @@ struct CardTests {
       // Since no card was created after card2, should select the last remaining card
       let nextCard = sortedCards.last
       #expect(nextCard != nil)
-      #expect(nextCard?.typeId == 1)
+      #expect(nextCard?.typeId == 2)  // addedCard1 has ID 2 (initial card is ID 1)
     }
   }
 
@@ -392,6 +407,7 @@ struct CardTests {
       let container = try! createInMemoryContainer()
       let cardManager = CardManager(modelContext: container.mainContext)
 
+      // Initial card is created first
       // Create cards in a specific order
       let addedCard1 = cardManager.addCard(cardType: .search)
       Thread.sleep(forTimeInterval: 0.01)
@@ -399,11 +415,12 @@ struct CardTests {
       Thread.sleep(forTimeInterval: 0.01)
       let addedCard3 = cardManager.addCard(cardType: .search)
 
-      let allCards =  cardManager.allCards;
-      // Verify creation order
-      #expect(allCards[0] == addedCard1)
-      #expect(allCards[1] == addedCard2)
-      #expect(allCards[2] == addedCard3)
+      let allCards = cardManager.allCards
+      // Verify creation order (initial card at index 0, then the added cards)
+      #expect(allCards.count == 4)  // 1 initial + 3 added
+      #expect(allCards[1] == addedCard1)
+      #expect(allCards[2] == addedCard2)
+      #expect(allCards[3] == addedCard3)
     }
   }
 

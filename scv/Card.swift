@@ -91,11 +91,22 @@ class CardManager {
   // MARK: - Properties
 
   private let modelContext: ModelContext
+  var selectedCardId: Card.ID?
 
   // MARK: - Initialization
 
   init(modelContext: ModelContext) {
     self.modelContext = modelContext
+
+    // Ensure at least one card exists
+    if allCards.isEmpty {
+      addCard(cardType: .search)
+    }
+
+    // Ensure a card is always selected
+    if selectedCardId == nil {
+      selectedCardId = allCards.first?.id
+    }
   }
 
   // MARK: - Public Properties
@@ -116,6 +127,12 @@ class CardManager {
   /// Returns total count of all cards
   var totalCount: Int {
     return allCards.count
+  }
+
+  /// Returns the currently selected card
+  var selectedCard: Card? {
+    guard let selectedCardId = selectedCardId else { return nil }
+    return allCards.first { $0.id == selectedCardId }
   }
 
   // MARK: - Public Methods
@@ -152,8 +169,23 @@ class CardManager {
     return newCard
   }
 
-  /// Removes a card (counts are never decremented)
+  /// Selects a card (ensures a card is always selected)
+  func selectCard(_ card: Card) {
+    selectedCardId = card.id
+  }
+
+  /// Removes a card and updates selection if necessary
   func removeCard(_ card: Card) {
+    // If the deleted card was selected, find the next card to select
+    if selectedCardId == card.id {
+      let remainingCards = allCards.filter { $0.id != card.id }
+
+      // Find the next card to select
+      if let nextCard = findNextCard(after: card, in: remainingCards) {
+        selectedCardId = nextCard.id
+      }
+    }
+
     modelContext.delete(card)
 
     do {
@@ -161,6 +193,22 @@ class CardManager {
     } catch {
       print("Failed to delete card: \(error)")
     }
+  }
+
+  /// Finds the next card to select after deleting a card
+  private func findNextCard(after deletedCard: Card, in remainingCards: [Card]) -> Card? {
+    guard !remainingCards.isEmpty else { return nil }
+
+    // Sort cards by creation date
+    let sortedCards = remainingCards.sorted { $0.createdAt < $1.createdAt }
+
+    // Find the card created after the deleted card
+    if let nextIndex = sortedCards.firstIndex(where: { $0.createdAt > deletedCard.createdAt }) {
+      return sortedCards[nextIndex]
+    }
+
+    // If no card was created after, select the last card
+    return sortedCards.last
   }
 
   /// Removes cards at specified indices

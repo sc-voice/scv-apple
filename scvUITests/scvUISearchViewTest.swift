@@ -18,7 +18,8 @@ final class scvUISearchViewTest: XCTestCase {
     app.launch()
 
     // Add a new card (first card should be a search card based on alternating logic)
-    let addButton = app.buttons["addCardButton"]
+    // Use firstMatch because the button appears twice in the accessibility hierarchy (SwiftUI toolbar nesting)
+    let addButton = app.buttons.matching(identifier: "addCardButton").firstMatch
     addButton.tap()
     
     // Wait for card creation
@@ -51,7 +52,8 @@ final class scvUISearchViewTest: XCTestCase {
     app.launch()
 
     // Add a search card
-    let addButton = app.buttons["addCardButton"]
+    // Use firstMatch because the button appears twice in the accessibility hierarchy (SwiftUI toolbar nesting)
+    let addButton = app.buttons.matching(identifier: "addCardButton").firstMatch
     addButton.tap()
     Thread.sleep(forTimeInterval: 0.5)
 
